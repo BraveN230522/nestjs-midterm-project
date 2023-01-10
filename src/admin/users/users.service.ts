@@ -12,7 +12,8 @@ export class UsersService {
     return this.users;
   }
 
-  createUser(name: string, status: UserStatus): IUser {
+  createUser(createUserDto): IUser {
+    const { name, status } = createUserDto;
     const user: IUser = {
       id: uuid(),
       name,
