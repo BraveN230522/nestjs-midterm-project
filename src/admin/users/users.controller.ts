@@ -8,10 +8,10 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { IUser } from '../../interfaces';
 import { CreateUserDto, FilterUserDto } from './dto/users.dto';
 import { UsersService } from './users.service';
 import _ from 'lodash';
+import { User } from './users.entity';
 
 @Controller('users')
 export class UsersController {
@@ -19,28 +19,29 @@ export class UsersController {
 
   @Get()
   getUsers(@Query() filterUserDto: FilterUserDto) {
-    if (_.keys(filterUserDto).length)
-      return this.usersService.filterUsers(filterUserDto);
-    else return this.usersService.getUsers();
-  }
-
-  @Post()
-  createUser(@Body() createUserDto: CreateUserDto): IUser {
-    return this.usersService.createUser(createUserDto);
+    return this.usersService.getUsers(filterUserDto);
   }
 
   @Get('/:id')
-  getUser(@Param('id') id): IUser {
+  getUser(@Param('id') id): Promise<User> {
     return this.usersService.getUser(id);
   }
 
+  @Post()
+  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.usersService.createUser(createUserDto);
+  }
+
   @Delete('/:id')
-  deleteUser(@Param('id') id): IUser[] {
+  deleteUser(@Param('id') id): Promise<void> {
     return this.usersService.deleteUser(id);
   }
 
   @Patch('/:id')
-  updateUser(@Param('id') id, @Body() updateUserDto: CreateUserDto): IUser {
+  updateUser(
+    @Param('id') id,
+    @Body() updateUserDto: CreateUserDto,
+  ): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 }
