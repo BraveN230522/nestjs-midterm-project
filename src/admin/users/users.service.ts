@@ -1,5 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 // import { IUser } from '../../interfaces';
 import { UserStatus } from '../../enums';
 import _ from 'lodash';
@@ -45,7 +50,14 @@ export class UsersService {
       status: status || UserStatus.Inactive,
     });
 
-    await this.usersRepository.save(user);
+    try {
+      await this.usersRepository.save(user);
+    } catch (error) {
+      if (error.code === '23505')
+        throw new ConflictException('This name already exists');
+      else throw new InternalServerErrorException();
+      console.log({ error });
+    }
 
     return user;
   }

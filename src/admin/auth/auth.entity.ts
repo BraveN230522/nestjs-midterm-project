@@ -1,18 +1,19 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UserStatus } from '../../enums';
 
 @Entity()
-export class User {
+export class Auth {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column()
+  username: string;
+
+  @Column()
+  password?: string;
 
   @Column({
     nullable: true,
     default: null,
-    unique: true,
   })
-  name?: string;
-
-  @Column()
-  status: UserStatus;
+  token?: string;
 }
