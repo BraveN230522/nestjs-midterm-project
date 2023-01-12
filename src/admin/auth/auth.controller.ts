@@ -12,10 +12,4 @@ export class AuthController {
   createUser(@Body() authCredentialsDto: AuthCredentialsDto): Promise<Auth> {
     return this.authService.login(authCredentialsDto);
   }
-
-  @Post('/test')
-  @UseGuards(AuthGuard())
-  test(@Req() req) {
-    console.log(req);
-  }
 }

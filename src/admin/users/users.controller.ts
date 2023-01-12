@@ -1,3 +1,4 @@
+import { AuthGuard } from '@nestjs/passport';
 import {
   Body,
   Controller,
@@ -7,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto, FilterUserDto } from './dto/users.dto';
 import { UsersService } from './users.service';
@@ -14,6 +16,7 @@ import _ from 'lodash';
 import { User } from './users.entity';
 
 @Controller('users')
+@UseGuards(AuthGuard())
 export class UsersController {
   constructor(private usersService: UsersService) {}
 

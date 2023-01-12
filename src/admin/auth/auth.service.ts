@@ -42,7 +42,7 @@ export class AuthService {
 
     return {
       ...mappingResponse,
-      token: accessToken,
+      token: 'Bearer ' + accessToken,
     };
 
     return found;
