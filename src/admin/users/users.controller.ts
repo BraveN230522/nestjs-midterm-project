@@ -16,7 +16,7 @@ import _ from 'lodash';
 import { User } from './users.entity';
 
 @Controller('users')
-@UseGuards(AuthGuard())
+// @UseGuards(AuthGuard())
 export class UsersController {
   constructor(private usersService: UsersService) {}
 

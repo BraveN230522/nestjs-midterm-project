@@ -1,21 +1,22 @@
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-// import { IUser } from '../../interfaces';
+import { InjectRepository } from '@nestjs/typeorm';
+import bcrypt from 'bcrypt';
 import { UserStatus } from '../../enums';
-import _ from 'lodash';
 import { assignIfHasKey } from '../../utilities';
-import { UsersRepository } from './users.repository';
+import { AuthRepository } from '../auth/auth.repository';
 import { User } from './users.entity';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository) private usersRepository: UsersRepository,
+    @InjectRepository(AuthRepository) private authRepository: AuthRepository,
   ) {}
 
   async getUsers(filterUserDto): Promise<User[]> {
@@ -44,22 +45,34 @@ export class UsersService {
   }
 
   async createUser(createUserDto): Promise<User> {
-    const { name, status } = createUserDto;
-    const user = this.usersRepository.create({
-      name,
-      status: status || UserStatus.Inactive,
-    });
-
     try {
+      const { name, status, username, password } = createUserDto;
+      const salt = bcrypt.genSaltSync(1);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+
+      const auth = this.authRepository.create({
+        username,
+        password: hashedPassword,
+      });
+
+      const user = this.usersRepository.create({
+        name,
+        status: status || UserStatus.Inactive,
+        auth: auth,
+      });
+
+      // console.log({ user, auth });
+
+      // await this.authRepository.save(auth);
       await this.usersRepository.save(user);
+
+      return user;
     } catch (error) {
+      console.log({ error });
       if (error.code === '23505')
         throw new ConflictException('This name already exists');
       else throw new InternalServerErrorException();
-      console.log({ error });
     }
-
-    return user;
   }
 
   async deleteUser(id): Promise<void> {

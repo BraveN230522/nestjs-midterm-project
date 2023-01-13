@@ -6,9 +6,8 @@ import {
   MinLength,
   MaxLength,
 } from 'class-validator';
-import { UserStatus } from '../../../enums';
 
-export class CreateUserDto {
+export class CreateTaskDto {
   @IsNotEmpty()
   name: string;
 
@@ -20,21 +19,13 @@ export class CreateUserDto {
   @MinLength(3)
   @MaxLength(32)
   password: string;
-
-  @IsNotEmpty()
-  @IsEnum(UserStatus)
-  status: UserStatus;
 }
 
-export class FilterUserDto {
+export class FilterTaskDto {
   @IsOptional()
   search: string;
-
-  @IsOptional()
-  @IsEnum(UserStatus)
-  status: UserStatus;
 }
 
-// export class GetUserDto {
+// export class GetTaskDto {
 //   uuid: string;
 // }

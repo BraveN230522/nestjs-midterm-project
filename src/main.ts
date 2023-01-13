@@ -1,3 +1,4 @@
+import { TransformInterceptor } from './common/transformers/transform.interceptor';
 import express from 'express';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -18,6 +19,7 @@ async function bootstrap() {
   app.use(upload.single('undefined'));
 
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   await app.listen(1999);
 }
