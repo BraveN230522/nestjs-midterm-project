@@ -1,24 +1,14 @@
-import {
-  IsNotEmpty,
-  IsEnum,
-  IsOptional,
-  IsString,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateTaskDto {
   @IsNotEmpty()
   name: string;
 
   @IsNotEmpty()
-  username: string;
+  startDate: string;
 
   @IsNotEmpty()
-  @IsString()
-  @MinLength(3)
-  @MaxLength(32)
-  password: string;
+  endDate: string;
 }
 
 export class FilterTaskDto {

@@ -10,6 +10,8 @@ import { assignIfHasKey } from '../../utilities';
 import { AuthRepository } from '../auth/auth.repository';
 import { Task } from './tasks.entity';
 import { TasksRepository } from './tasks.repository';
+import { CreateTaskDto } from './dto/tasks.dto';
+import { User } from '../users/users.entity';
 
 @Injectable()
 export class TasksService {
@@ -43,29 +45,22 @@ export class TasksService {
     return found;
   }
 
-  async createTask(createTaskDto): Promise<Task> {
+  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     try {
-      const { name, status, username, password } = createTaskDto;
-      const salt = bcrypt.genSaltSync(1);
-      const hashedPassword = bcrypt.hashSync(password, salt);
+      const { name, startDate, endDate } = createTaskDto;
 
-      // const user = this.tasksRepository.create({
-      //   name,
-      //   status: status || TaskStatus.Inactive,
-      //   auth: auth,
-      // });
+      const task = this.tasksRepository.create({
+        name,
+        startDate,
+        endDate,
+        user,
+      });
 
-      // console.log({ user, auth });
+      await this.tasksRepository.save(task);
 
-      // await this.authRepository.save(auth);
-      // await this.tasksRepository.save(user);
-
-      return null;
+      return task;
     } catch (error) {
-      console.log({ error });
-      if (error.code === '23505')
-        throw new ConflictException('This name already exists');
-      else throw new InternalServerErrorException();
+      throw new InternalServerErrorException();
     }
   }
 

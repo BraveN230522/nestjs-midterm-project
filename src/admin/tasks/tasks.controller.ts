@@ -14,9 +14,11 @@ import { CreateTaskDto, FilterTaskDto } from './dto/tasks.dto';
 import { TasksService } from './tasks.service';
 import _ from 'lodash';
 import { Task } from './tasks.entity';
+import { UserDecorator } from '../../common';
+import { User } from '../users/users.entity';
 
 @Controller('tasks')
-// @UseGuards(AuthGuard())
+@UseGuards(AuthGuard())
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
@@ -30,10 +32,13 @@ export class TasksController {
   //   return this.tasksService.getTask(id);
   // }
 
-  // @Post()
-  // createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-  //   return this.tasksService.createTask(createTaskDto);
-  // }
+  @Post()
+  createTask(
+    @Body() createTaskDto: CreateTaskDto,
+    @UserDecorator() user: User,
+  ): Promise<Task> {
+    return this.tasksService.createTask(createTaskDto, user);
+  }
 
   // @Delete('/:id')
   // deleteTask(@Param('id') id): Promise<void> {

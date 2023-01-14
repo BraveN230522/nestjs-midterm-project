@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { UserStatus } from '../../enums';
+import { Role, UserStatus } from '../../enums';
 import { Auth } from '../auth/auth.entity';
 import { Exclude } from 'class-transformer';
 import { Task } from '../tasks/tasks.entity';
@@ -16,11 +16,7 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({
-    nullable: true,
-    default: null,
-    unique: true,
-  })
+  @Column()
   name?: string;
 
   @Column()

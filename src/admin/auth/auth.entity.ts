@@ -6,17 +6,28 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/users.entity';
+import { Exclude } from 'class-transformer';
+import { Role } from '../../enums';
 
 @Entity()
 export class Auth {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   username: string;
 
   @Column()
   password?: string;
+
+  @Column({
+    nullable: false,
+    default: Role.ADMIN,
+  })
+  role: Role;
 
   @Column({
     nullable: true,
