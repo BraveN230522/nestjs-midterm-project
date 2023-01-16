@@ -1,4 +1,13 @@
 {
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "bracketSameLine": true,
+  "semi": true,
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "endOfLine": "auto",
+  "importOrderParserPlugins": ["typescript", "decorators-legacy"],
+  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+  "importOrderSortSpecifiers": true,
+  "importOrderSeparation": false
 }
