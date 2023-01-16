@@ -15,7 +15,7 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(@InjectRepository(UsersRepository) private usersRepository: UsersRepository) {}
 
-  async getUsers(filterUserDto): Promise<Pagination<User, IPaginationMeta>> {
+  async getUsers(filterUserDto): Promise<any> {
     const { page, perPage } = filterUserDto;
 
     // const query = this.usersRepository.createQueryBuilder('user');
@@ -30,8 +30,8 @@ export class UsersService {
     // const tasks = await query.getMany();
 
     return this.usersRepository.paginationRepository(this.usersRepository, {
-      page: page,
-      limit: perPage,
+      page,
+      perPage,
     });
     // return tasks;
   }

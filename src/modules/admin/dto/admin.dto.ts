@@ -20,9 +20,6 @@ export class AdminCredentialsDto {
 
 export class CreateAdminDto {
   @IsNotEmpty()
-  name: string;
-
-  @IsNotEmpty()
   username: string;
 
   @IsNotEmpty()
@@ -30,8 +27,4 @@ export class CreateAdminDto {
   @MinLength(3)
   @MaxLength(32)
   password: string;
-
-  @IsNotEmpty()
-  @IsEnum(UserStatus)
-  status: UserStatus;
 }

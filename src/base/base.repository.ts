@@ -15,6 +15,8 @@ import {
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { BaseTable } from './base.entity';
+import { genPagination, numberInputs } from '../utilities';
+import { IPageOption } from '../interfaces';
 
 export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
   constructor(protected readonly repo: Repository<Model>) {
@@ -82,13 +84,19 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
 
   async paginationRepository(
     repository: Repository<Model>,
-    options: IPaginationOptions,
-    searchOptions?: FindManyOptions<Model>,
-  ): Promise<Pagination<Model, IPaginationMeta>> {
-    const pgResult = await paginate(repository, options, searchOptions);
+    pageOption: IPageOption,
+    options?: FindOneOptions<Model>,
+  ): Promise<any> {
+    const { page, perPage } = numberInputs(pageOption);
+    const [result, total] = await repository.findAndCount({
+      take: perPage || 10,
+      skip: (page - 1) * perPage || 0,
+      ...options,
+    });
+    console.log({ page, perPage, total });
     return {
-      ...pgResult,
-      items: instanceToPlain(pgResult.items) as any,
+      items: instanceToPlain(result),
+      pagination: genPagination(page, perPage, total),
     };
   }
 

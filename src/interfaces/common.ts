@@ -5,3 +5,8 @@ export interface ObjectAny {
 export interface IResponse<T> {
   data: T;
 }
+
+export interface IPageOption {
+  page?: number;
+  perPage?: number;
+}

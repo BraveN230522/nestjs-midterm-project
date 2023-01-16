@@ -27,7 +27,7 @@ export class UsersController {
 
   @Get()
   @RoleDecorator(Role.USER, Role.ADMIN)
-  getUsers(@Query() filterUserDto: FilterUserDto) {
+  getUsers(@Body() filterUserDto: FilterUserDto) {
     return this.usersService.getUsers(filterUserDto);
   }
 
