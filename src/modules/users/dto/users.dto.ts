@@ -21,11 +21,10 @@ export class CreateUserDto {
 
 export class FilterUserDto {
   @IsOptional()
-  search: string;
+  page: string;
 
   @IsOptional()
-  @IsEnum(UserStatus)
-  status: UserStatus;
+  perPage: string;
 }
 
 // export class GetUserDto {

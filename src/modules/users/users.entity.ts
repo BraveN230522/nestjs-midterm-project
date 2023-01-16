@@ -1,13 +1,14 @@
 import { Exclude } from 'class-transformer';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseTable } from '../../base';
 import { Role, UserStatus } from '../../enums';
 import { Admin } from '../admin/admin.entity';
 import { Task } from '../tasks/tasks.entity';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class User extends BaseTable {
+  // @PrimaryGeneratedColumn('uuid')
+  // id: string;
 
   @Column()
   name?: string;

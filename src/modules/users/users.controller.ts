@@ -38,6 +38,7 @@ export class UsersController {
   }
 
   @Post()
+  @RoleDecorator(Role.ADMIN)
   createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }

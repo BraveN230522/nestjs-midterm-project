@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
+import { IPaginationMeta, Pagination } from 'nestjs-typeorm-paginate';
 import { assignIfHasKey } from '../../utilities';
 import { User } from './users.entity';
 import { UsersRepository } from './users.repository';
@@ -14,21 +15,25 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(@InjectRepository(UsersRepository) private usersRepository: UsersRepository) {}
 
-  async getUsers(filterUserDto): Promise<User[]> {
-    const { search, status } = filterUserDto;
+  async getUsers(filterUserDto): Promise<Pagination<User, IPaginationMeta>> {
+    const { page, perPage } = filterUserDto;
 
-    const query = this.usersRepository.createQueryBuilder('user');
+    // const query = this.usersRepository.createQueryBuilder('user');
 
-    if (status) query.andWhere('user.status = :status', { status });
+    // if (status) query.andWhere('user.status = :status', { status });
 
-    if (search)
-      query.andWhere('LOWER(user.name) LIKE LOWER(:search)', {
-        search: `%${search}%`,
-      });
+    // if (search)
+    //   query.andWhere('LOWER(user.name) LIKE LOWER(:search)', {
+    //     search: `%${search}%`,
+    //   });
 
-    const tasks = await query.getMany();
+    // const tasks = await query.getMany();
 
-    return tasks;
+    return this.usersRepository.paginationRepository(this.usersRepository, {
+      page: page,
+      limit: perPage,
+    });
+    // return tasks;
   }
 
   async getUserByUsername({ username }): Promise<User> {
@@ -65,7 +70,7 @@ export class UsersService {
       // console.log({ user, auth });
 
       // await this.authRepository.save(auth);
-      await this.usersRepository.save(user);
+      await this.usersRepository.save([user]);
 
       return user;
     } catch (error) {
@@ -84,7 +89,7 @@ export class UsersService {
     const user = await this.getUser(id);
     assignIfHasKey(user, updateUserDto);
 
-    await this.usersRepository.save(user);
+    await this.usersRepository.save([user]);
 
     return user;
   }

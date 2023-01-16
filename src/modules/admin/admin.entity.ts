@@ -1,12 +1,15 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { IsDate } from 'class-validator';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseTable } from '../../base';
 import { Role } from '../../enums';
 import { User } from '../users/users.entity';
 
 @Entity()
-export class Admin {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class Admin extends BaseTable {
+  constructor(partial: Partial<Admin>) {
+    super();
+    Object.assign(this, partial);
+  }
   @Column({
     nullable: false,
     unique: true,
