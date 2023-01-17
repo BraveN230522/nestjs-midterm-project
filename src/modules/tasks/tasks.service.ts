@@ -82,4 +82,13 @@ export class TasksService {
 
     return user;
   }
+
+  async getUserTasks(id, userTasksDto): Promise<any> {
+    const queryBuilderRepo = await this.tasksRepository
+      .createQueryBuilder('t')
+      .innerJoinAndSelect('user', 'u', 'u.id = t.userId')
+      .where('t.userId = :id', { id: id });
+
+    return await this.tasksRepository.paginationQueryBuilder(queryBuilderRepo, userTasksDto);
+  }
 }

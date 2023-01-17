@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
+import { json } from 'express';
 import { assignIfHasKey } from '../../utilities';
 import { Task } from '../tasks/tasks.entity';
 import { TasksService } from '../tasks/tasks.service';
@@ -18,9 +19,9 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository) private usersRepository: UsersRepository,
-    @Inject(forwardRef(() => TasksService))
-    private readonly tasksService: TasksService,
-  ) {}
+  ) // @Inject(forwardRef(() => TasksService))
+  // private readonly tasksService: TasksService,
+  {}
 
   async getUsers(filterUserDto): Promise<any> {
     const { page, perPage } = filterUserDto;
@@ -103,13 +104,5 @@ export class UsersService {
     await this.usersRepository.save([user]);
 
     return user;
-  }
-
-  async getUserTasks(id, userTasksDto): Promise<Task[]> {
-    return await this.tasksService.getTasks(userTasksDto, { where: { id } });
-    // const user = await this.getUser(id);
-    // assignIfHasKey(user, updateUserDto);
-    // await this.usersRepository.save([user]);
-    // return user;
   }
 }

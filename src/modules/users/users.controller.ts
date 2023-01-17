@@ -60,10 +60,4 @@ export class UsersController {
   updateUser(@Param('id') id, @Body() updateUserDto: CreateUserDto): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
   }
-
-  @Get('/tasks/:id')
-  @RoleDecorator(Role.USER, Role.ADMIN)
-  getUserTasks(@Param('id') id, @Body() userTasksDto: UserTasksDto): Promise<Task[]> {
-    return this.usersService.getUserTasks(id, userTasksDto);
-  }
 }

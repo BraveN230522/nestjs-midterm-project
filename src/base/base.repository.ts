@@ -1,7 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
 import { EventEmitter } from 'events';
-import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 import {
   DeepPartial,
   DeleteResult,
@@ -85,7 +84,7 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
   async paginationRepository(
     repository: Repository<Model>,
     pageOption: IPageOption,
-    options?: FindOneOptions<Model>,
+    options?: any,
   ): Promise<any> {
     const { page, perPage } = numberInputs(pageOption);
     const [result, total] = await repository.findAndCount({
@@ -101,16 +100,20 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
 
   async paginationQueryBuilder(
     queryBuilder: SelectQueryBuilder<Model>,
-    options: IPaginationOptions,
-  ): Promise<Pagination<Model, IPaginationMeta>> {
-    const pgResult = await paginate(queryBuilder, options);
+    options: IPageOption,
+  ): Promise<any> {
+    const { perPage, page } = numberInputs(options);
+    const total = await queryBuilder.getCount();
+    const itemsInPageRaw = queryBuilder.skip(perPage * (page - 1)).take(perPage);
+    const result = await itemsInPageRaw.getMany();
+
     return {
-      ...pgResult,
-      items: instanceToPlain(pgResult.items) as any,
+      items: result,
+      pagination: genPagination(page, perPage, total),
     };
   }
 
-  getModel(): Repository<Model> {
+  getRepo(): Repository<Model> {
     return this.repo;
   }
 }

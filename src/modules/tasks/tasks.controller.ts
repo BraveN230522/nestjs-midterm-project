@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Param } from '@nestjs/common/decorators';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
@@ -40,4 +41,10 @@ export class TasksController {
   // ): Promise<Task> {
   //   return this.tasksService.updateTask(id, updateTaskDto);
   // }
+
+  @Get('/users/:id')
+  @RoleDecorator(Role.USER, Role.ADMIN)
+  getUserTasks(@Param('id') id, @Body() filterTaskDto: FilterTaskDto): Promise<Task[]> {
+    return this.tasksService.getUserTasks(id, filterTaskDto);
+  }
 }
