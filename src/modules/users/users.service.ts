@@ -6,7 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
+import { instanceToPlain } from 'class-transformer';
 import { IPaginationMeta, Pagination } from 'nestjs-typeorm-paginate';
+import { UserDecorator } from '../../common';
 import { assignIfHasKey } from '../../utilities';
 import { User } from './users.entity';
 import { UsersRepository } from './users.repository';
@@ -37,7 +39,7 @@ export class UsersService {
   }
 
   async getUserByUsername({ username }): Promise<User> {
-    return await this.usersRepository.findOneBy({ username });
+    return await this.usersRepository.findOneRaw({ username });
   }
 
   async getUser(id): Promise<User> {
@@ -46,6 +48,10 @@ export class UsersService {
     if (!found) throw new NotFoundException(`User ${id} is not found`);
 
     return found;
+  }
+
+  async getCurrentUser(user): Promise<User> {
+    return user;
   }
 
   async createUser(createUserDto): Promise<User> {

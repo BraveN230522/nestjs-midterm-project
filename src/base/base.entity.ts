@@ -12,7 +12,7 @@ export abstract class BaseTable {
   })
   @CreateDateColumn({ type: 'time without time zone' })
   @IsDate()
-  public created_at: Date;
+  public createdAt: Date;
 
   @Column({
     type: 'time without time zone',
@@ -20,5 +20,5 @@ export abstract class BaseTable {
   })
   @CreateDateColumn({ type: 'time without time zone' })
   @IsDate()
-  public updated_at: Date;
+  public updatedAt: Date;
 }

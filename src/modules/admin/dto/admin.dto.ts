@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { UserStatus } from '../../../enums';
 
 export class AdminCredentialsDto {
@@ -27,4 +27,10 @@ export class CreateAdminDto {
   @MinLength(3)
   @MaxLength(32)
   password: string;
+}
+
+export class UpdateAdminDto {
+  @IsString()
+  @IsOptional()
+  token?: string;
 }

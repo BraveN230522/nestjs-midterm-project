@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTable } from '../../base';
 import { Role, UserStatus } from '../../enums';
@@ -7,9 +7,6 @@ import { Task } from '../tasks/tasks.entity';
 
 @Entity()
 export class User extends BaseTable {
-  // @PrimaryGeneratedColumn('uuid')
-  // id: string;
-
   @Column()
   name?: string;
 
@@ -19,6 +16,7 @@ export class User extends BaseTable {
   })
   username: string;
 
+  @Exclude({ toPlainOnly: true })
   @Column()
   password?: string;
 
@@ -34,6 +32,7 @@ export class User extends BaseTable {
   })
   role: Role;
 
+  @Exclude({ toPlainOnly: true })
   @Column({
     nullable: true,
     default: null,

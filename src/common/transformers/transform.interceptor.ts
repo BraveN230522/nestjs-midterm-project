@@ -10,14 +10,13 @@ export class TransformInterceptor<T> implements NestInterceptor<T, IResponse<T>>
     const request = context.switchToHttp().getRequest();
     return next.handle().pipe(
       map((data) => {
-        const instanceToPlainData = instanceToPlain({
+        return {
           success: true,
           code: context.switchToHttp().getResponse().statusCode,
           data,
           //@ts-ignore
           message: request.message || data.message,
-        });
-        return instanceToPlainData;
+        };
       }),
     );
   }

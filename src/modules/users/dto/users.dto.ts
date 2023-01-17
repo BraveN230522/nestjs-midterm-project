@@ -17,6 +17,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsEnum(UserStatus)
   status: UserStatus;
+
+  @IsOptional()
+  token: string;
 }
 
 export class FilterUserDto {

@@ -14,9 +14,9 @@ import {
   UpdateResult,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { BaseTable } from './base.entity';
-import { genPagination, numberInputs } from '../utilities';
 import { IPageOption } from '../interfaces';
+import { genPagination, numberInputs } from '../utilities';
+import { BaseTable } from './base.entity';
 
 export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
   constructor(protected readonly repo: Repository<Model>) {
@@ -36,15 +36,15 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
   }
 
   async findOne(options: FindOneOptions<Model>): Promise<Model> {
-    return await this.repo.findOne(options);
+    return (await instanceToPlain(this.repo.findOne(options))) as Model;
   }
 
-  async findRaw(conditions, options?: FindOneOptions<Model>): Promise<Model> {
-    return this.findRaw({ where: conditions, ...options });
+  async findRaw(conditions, options?: FindOneOptions<Model>): Promise<Model[]> {
+    return this.repo.find({ where: conditions, ...options });
   }
 
   async findOneRaw(conditions, options?: FindOneOptions<Model>): Promise<Model> {
-    return instanceToPlain(this.findOneRaw(conditions, options)) as Model;
+    return this.repo.findOne({ where: conditions, ...options });
   }
 
   async findByIds(ids: any[]): Promise<Model[]> {
@@ -93,7 +93,6 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
       skip: (page - 1) * perPage || 0,
       ...options,
     });
-    console.log({ page, perPage, total });
     return {
       items: instanceToPlain(result),
       pagination: genPagination(page, perPage, total),

@@ -10,8 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
-import { RoleDecorator } from '../../common/decorators';
+import { RoleDecorator, UserDecorator } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 import { Role } from '../../enums';
 import { CreateUserDto, FilterUserDto } from './dto/users.dto';
@@ -31,8 +32,14 @@ export class UsersController {
     return this.usersService.getUsers(filterUserDto);
   }
 
+  @Get('/me')
+  @RoleDecorator(Role.USER)
+  getCurrentUser(@UserDecorator() currentUser): Promise<User> {
+    return this.usersService.getCurrentUser(currentUser);
+  }
+
   @Get('/:id')
-  @RoleDecorator(Role.USER, Role.SUPER_ADMIN)
+  @RoleDecorator(Role.USER, Role.ADMIN)
   getUser(@Param('id') id): Promise<User> {
     return this.usersService.getUser(id);
   }

@@ -1,14 +1,14 @@
 import { Controller } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { Body, Post } from '@nestjs/common/decorators';
-import { RoleDecorator } from '../../common';
+import { Body, Get, Post, UseGuards } from '@nestjs/common/decorators';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
-import { CreateAdminDto } from './dto/admin.dto';
 import { Admin } from './admin.entity';
-
-// import { AdminGuard } from '@nestjs/passport';
+import { AdminService } from './admin.service';
+import { CreateAdminDto } from './dto/admin.dto';
 
 @Controller('admin')
+@UseGuards(AuthGuard(), RolesGuard)
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
@@ -16,5 +16,12 @@ export class AdminController {
   // @RoleDecorator(Role.ADMIN)
   createUser(@Body() createAdminDto: CreateAdminDto): Promise<Admin> {
     return this.adminService.createAdmin(createAdminDto);
+  }
+
+  @Get('/me')
+  @RoleDecorator(Role.ADMIN)
+  getCurrentUser(@UserDecorator() user): Promise<Admin> {
+    console.log({ user });
+    return this.adminService.getCurrentAdmin(user);
   }
 }
