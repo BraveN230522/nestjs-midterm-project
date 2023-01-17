@@ -1,40 +1,23 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { User } from '../users/users.entity';
 import { Exclude } from 'class-transformer';
+import { Column, CreateDateColumn, Entity, ManyToOne, UpdateDateColumn } from 'typeorm';
+import { BaseTable } from '../../base';
+import { User } from '../users/users.entity';
 
 @Entity()
-export class Task {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class Task extends BaseTable {
+  constructor(partial: Partial<Task>) {
+    super();
+    Object.assign(this, partial);
+  }
 
   @Column()
   name: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp with time zone' })
   startDate: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp with time zone' })
   endDate: Date;
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updated_at: Date;
 
   @Exclude({ toPlainOnly: true })
   @ManyToOne(() => User, (user) => user.tasks, { onDelete: 'CASCADE' })

@@ -7,6 +7,11 @@ import { Task } from '../tasks/tasks.entity';
 
 @Entity()
 export class User extends BaseTable {
+  constructor(partial: Partial<User>) {
+    super();
+    Object.assign(this, partial);
+  }
+
   @Column()
   name?: string;
 
@@ -26,11 +31,12 @@ export class User extends BaseTable {
   })
   status: UserStatus;
 
+  @Exclude({ toPlainOnly: true })
   @Column({
     nullable: false,
     default: Role.USER,
   })
-  role: Role;
+  role?: Role;
 
   @Exclude({ toPlainOnly: true })
   @Column({

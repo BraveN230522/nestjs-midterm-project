@@ -7,18 +7,18 @@ export abstract class BaseTable {
   public id: number;
 
   @Column({
-    type: 'time without time zone',
+    type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @CreateDateColumn({ type: 'time without time zone' })
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   @IsDate()
   public createdAt: Date;
 
   @Column({
-    type: 'time without time zone',
+    type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @CreateDateColumn({ type: 'time without time zone' })
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   @IsDate()
   public updatedAt: Date;
 }

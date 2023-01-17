@@ -30,6 +30,14 @@ export class FilterUserDto {
   perPage: string;
 }
 
+export class UserTasksDto {
+  @IsOptional()
+  page: string;
+
+  @IsOptional()
+  perPage: string;
+}
+
 // export class GetUserDto {
 //   uuid: string;
 // }

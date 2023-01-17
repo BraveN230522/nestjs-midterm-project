@@ -4,6 +4,9 @@ export class CreateTaskDto {
   @IsNotEmpty()
   name: string;
 
+  @IsOptional()
+  userId: string;
+
   @IsNotEmpty()
   startDate: string;
 
@@ -13,7 +16,10 @@ export class CreateTaskDto {
 
 export class FilterTaskDto {
   @IsOptional()
-  search: string;
+  page: string;
+
+  @IsOptional()
+  perPage: string;
 }
 
 // export class GetTaskDto {

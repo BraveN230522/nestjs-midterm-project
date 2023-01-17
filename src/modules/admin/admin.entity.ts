@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { IsDate } from 'class-validator';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTable } from '../../base';
@@ -10,6 +11,7 @@ export class Admin extends BaseTable {
     super();
     Object.assign(this, partial);
   }
+
   @Column({
     nullable: false,
     unique: true,
@@ -19,11 +21,12 @@ export class Admin extends BaseTable {
   @Column()
   password?: string;
 
+  @Exclude({ toPlainOnly: true })
   @Column({
     nullable: false,
     default: Role.ADMIN,
   })
-  role: Role;
+  role?: Role;
 
   @Column({
     nullable: true,

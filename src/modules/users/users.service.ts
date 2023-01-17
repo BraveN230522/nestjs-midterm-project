@@ -10,12 +10,17 @@ import { instanceToPlain } from 'class-transformer';
 import { IPaginationMeta, Pagination } from 'nestjs-typeorm-paginate';
 import { UserDecorator } from '../../common';
 import { assignIfHasKey } from '../../utilities';
+import { Task } from '../tasks/tasks.entity';
+import { TasksService } from '../tasks/tasks.service';
 import { User } from './users.entity';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(UsersRepository) private usersRepository: UsersRepository) {}
+  constructor(
+    @InjectRepository(UsersRepository) private usersRepository: UsersRepository,
+    private tasksService: TasksService,
+  ) {}
 
   async getUsers(filterUserDto): Promise<any> {
     const { page, perPage } = filterUserDto;
@@ -98,5 +103,13 @@ export class UsersService {
     await this.usersRepository.save([user]);
 
     return user;
+  }
+
+  async getUserTasks(id, userTasksDto): Promise<Task[]> {
+    return await this.tasksService.getTasks(userTasksDto, { where: { id } });
+    // const user = await this.getUser(id);
+    // assignIfHasKey(user, updateUserDto);
+    // await this.usersRepository.save([user]);
+    // return user;
   }
 }

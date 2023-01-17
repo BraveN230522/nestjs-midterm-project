@@ -15,7 +15,8 @@ import _ from 'lodash';
 import { RoleDecorator, UserDecorator } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 import { Role } from '../../enums';
-import { CreateUserDto, FilterUserDto } from './dto/users.dto';
+import { Task } from '../tasks/tasks.entity';
+import { CreateUserDto, FilterUserDto, UserTasksDto } from './dto/users.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
 
@@ -58,5 +59,11 @@ export class UsersController {
   @Patch('/:id')
   updateUser(@Param('id') id, @Body() updateUserDto: CreateUserDto): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
+  }
+
+  @Get('/tasks/:id')
+  @RoleDecorator(Role.USER, Role.ADMIN)
+  getUserTasks(@Param('id') id, @Body() userTasksDto: UserTasksDto): Promise<Task[]> {
+    return this.usersService.getUserTasks(id, userTasksDto);
   }
 }

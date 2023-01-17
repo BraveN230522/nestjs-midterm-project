@@ -6,32 +6,33 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
-import { assignIfHasKey } from '../../utilities';
+import _ from 'lodash';
+import { FindOneOptions } from 'typeorm';
+import { assignIfHasKey, datesToISOString } from '../../utilities';
+import { User } from '../users/users.entity';
+import { UsersService } from '../users/users.service';
+import { CreateTaskDto } from './dto/tasks.dto';
 import { Task } from './tasks.entity';
 import { TasksRepository } from './tasks.repository';
-import { CreateTaskDto } from './dto/tasks.dto';
-import { User } from '../users/users.entity';
 
 @Injectable()
 export class TasksService {
   authRepository: any;
-  constructor(@InjectRepository(TasksRepository) private tasksRepository: TasksRepository) {}
+  constructor(
+    @InjectRepository(TasksRepository) private tasksRepository: TasksRepository,
+    private usersService: UsersService,
+  ) {}
 
-  async getTasks(filterTaskDto): Promise<Task[]> {
-    const { search, status } = filterTaskDto;
-
-    const query = this.tasksRepository.createQueryBuilder('user');
-
-    if (status) query.andWhere('user.status = :status', { status });
-
-    if (search)
-      query.andWhere('LOWER(user.name) LIKE LOWER(:search)', {
-        search: `%${search}%`,
-      });
-
-    const tasks = await query.getMany();
-
-    return tasks;
+  async getTasks(filterTaskDto, options?: FindOneOptions<Task>): Promise<Task[]> {
+    const { page, perPage } = filterTaskDto;
+    return this.tasksRepository.paginationRepository(
+      this.tasksRepository,
+      {
+        page,
+        perPage,
+      },
+      options,
+    );
   }
 
   async getTask(id): Promise<Task> {
@@ -42,20 +43,23 @@ export class TasksService {
     return found;
   }
 
-  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
+  async createTask(createTaskDto: CreateTaskDto, currentUser: User): Promise<Task> {
     try {
-      const { name, startDate, endDate } = createTaskDto;
-
+      const { name, userId, startDate, endDate } = createTaskDto;
+      const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
+      const user = await this.usersService.getUser(userId);
       const task = this.tasksRepository.create({
         name,
-        startDate,
-        endDate,
-        user,
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+        user: user || currentUser,
       });
 
-      await this.tasksRepository.save(task);
+      await this.tasksRepository.save([task]);
 
-      return task;
+      const mappingTask = _.omit(task, ['user']) as Task;
+
+      return mappingTask;
     } catch (error) {
       console.log({ error });
       if (error.code === '23505') throw new ConflictException('This name already exists');
@@ -72,7 +76,7 @@ export class TasksService {
     const user = await this.getTask(id);
     assignIfHasKey(user, updateTaskDto);
 
-    await this.tasksRepository.save(user);
+    await this.tasksRepository.save([user]);
 
     return user;
   }
