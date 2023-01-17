@@ -1,11 +1,12 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import bcrypt from 'bcrypt';
 import _ from 'lodash';
 import { FindOneOptions } from 'typeorm';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
@@ -19,8 +20,9 @@ import { TasksRepository } from './tasks.repository';
 export class TasksService {
   authRepository: any;
   constructor(
-    @InjectRepository(TasksRepository) private tasksRepository: TasksRepository,
-    private usersService: UsersService,
+    @InjectRepository(TasksRepository) private tasksRepository: TasksRepository, // private usersService: UsersService,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
   ) {}
 
   async getTasks(filterTaskDto, options?: FindOneOptions<Task>): Promise<Task[]> {

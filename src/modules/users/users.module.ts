@@ -10,9 +10,9 @@ import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
 @Module({
-  imports: [TasksModule, TypeOrmModule.forFeature([User, Task]), PassportModule],
+  imports: [TypeOrmModule.forFeature([User, Task]), PassportModule, TasksModule],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository, TasksService],
-  exports: [UsersRepository],
+  exports: [UsersRepository, UsersService],
 })
 export class UsersModule {}

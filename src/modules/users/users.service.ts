@@ -1,14 +1,13 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
-import { instanceToPlain } from 'class-transformer';
-import { IPaginationMeta, Pagination } from 'nestjs-typeorm-paginate';
-import { UserDecorator } from '../../common';
 import { assignIfHasKey } from '../../utilities';
 import { Task } from '../tasks/tasks.entity';
 import { TasksService } from '../tasks/tasks.service';
@@ -19,7 +18,8 @@ import { UsersRepository } from './users.repository';
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository) private usersRepository: UsersRepository,
-    private tasksService: TasksService,
+    @Inject(forwardRef(() => TasksService))
+    private readonly tasksService: TasksService,
   ) {}
 
   async getUsers(filterUserDto): Promise<any> {

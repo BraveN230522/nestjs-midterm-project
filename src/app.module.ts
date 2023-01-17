@@ -7,6 +7,6 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
-  imports: [UsersModule, AdminModule, AuthModule, TasksModule, DatabaseModule, AppConfigModule],
+  imports: [TasksModule, UsersModule, AdminModule, AuthModule, DatabaseModule, AppConfigModule],
 })
 export class AppModule {}
