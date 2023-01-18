@@ -45,7 +45,7 @@ export class ProjectsController {
 
   @RoleDecorator(Role.ADMIN, Role.USER)
   @Patch('/members/:id')
-  addMembers(@Body('memberIds') ids): Promise<Project> {
-    return this.projectsService.addMembers(ids);
+  addMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project> {
+    return this.projectsService.addMembers(ids, id);
   }
 }

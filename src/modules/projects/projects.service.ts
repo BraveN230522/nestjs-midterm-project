@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import _ from 'lodash';
 import slugify from 'slugify';
+import { PAGE_NO_LIMIT } from '../../constants';
 import { IPaginationResponse } from '../../interfaces';
-import { datesToISOString } from '../../utilities';
-import { User } from '../users/users.entity';
+import { assignIfHasKey, datesToISOString } from '../../utilities';
 import { UsersRepository } from '../users/users.repository';
 import { ErrorHelper } from './../../helpers/error.helper';
 import { CreateProjectDto } from './dto/projects.dto';
@@ -51,9 +52,9 @@ export class ProjectsService {
   }
 
   async getProject(id): Promise<Project> {
-    const found = await this.projectsRepository.findOneBy({ id });
+    const found = await this.projectsRepository.findOneByRaw({ id });
 
-    if (!found) ErrorHelper.NotFoundException(`Task ${id} is not found`);
+    if (!found) ErrorHelper.NotFoundException(`Project ${id} is not found`);
 
     return found;
   }
@@ -74,29 +75,16 @@ export class ProjectsService {
     );
   }
 
-  async addMembers(ids): Promise<any> {
-    const members: number[] = JSON.parse(ids);
-    // console.log({ ids });
-    const data = this.usersRepository.findByIds(members);
-    return data;
-    // const projectId = Number(req.params.id)
-    // const projectRepository = myDataSource.getRepository(Projects)
-    // const projectToUpdate = await projectRepository.findOne({
-    //   where: { id: projectId },
-    //   relations: ['users'],
-    // })
+  async addMembers(ids, id): Promise<any> {
+    const memberIds: number[] = JSON.parse(ids);
+    const users = await this.usersRepository.findByIds(memberIds);
+    const membersOfProject = await this.getProjectMembers(id, PAGE_NO_LIMIT);
+    const project = await this.getProject(id);
 
-    // const members: number[] = JSON.parse(req.body.memberIds)
+    const memberShouldBeAdded = _.differenceBy(membersOfProject.items, users, 'id');
 
-    // const membersOfProject = await myDataSource.getRepository(Users).find({ where: { id: In(members) } })
-    // if (projectToUpdate) {
-    //   const memberShouldBeAdded = _.differenceBy(membersOfProject, projectToUpdate.users, 'id')
+    assignIfHasKey(project, { users: [...membersOfProject.items, ...memberShouldBeAdded] });
 
-    //   projectToUpdate.users = [...projectToUpdate.users, ...memberShouldBeAdded]
-    //   await projectRepository.save(projectToUpdate)
-    //   res.status(200).json(dataMappingSuccess({ data: projectToUpdate }))
-    // } else {
-    //   return res.status(404).json(dataMapping({ message: 'No projects found' }))
-    // }
+    return await this.projectsRepository.save([project]);
   }
 }

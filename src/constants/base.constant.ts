@@ -17,6 +17,10 @@ export const PAGE = 1;
 export const OFFSET = 0;
 export const SOFT_TYPE = 'DESC';
 export const SOFT_FIELD = 'updated_at';
+export const PAGE_NO_LIMIT = {
+  page: 1,
+  perPage: 0,
+};
 
 export const INVESTOR_EXCEL_NAME = 'investors.xlsx';
 
