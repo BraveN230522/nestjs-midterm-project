@@ -9,6 +9,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import _ from 'lodash';
 import { FindOneOptions } from 'typeorm';
+import { ErrorHelper } from '../../helpers';
+import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
 import { User } from '../users/users.entity';
 import { UsersService } from '../users/users.service';
@@ -25,22 +27,18 @@ export class TasksService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getTasks(filterTaskDto, options?: FindOneOptions<Task>): Promise<Task[]> {
+  async getTasks(filterTaskDto): Promise<IPaginationResponse<Task>> {
     const { page, perPage } = filterTaskDto;
-    return this.tasksRepository.paginationRepository(
-      this.tasksRepository,
-      {
-        page,
-        perPage,
-      },
-      options,
-    );
+    return this.tasksRepository.paginationRepository(this.tasksRepository, {
+      page,
+      perPage,
+    });
   }
 
   async getTask(id): Promise<Task> {
     const found = await this.tasksRepository.findOneBy({ id });
 
-    if (!found) throw new NotFoundException(`Task ${id} is not found`);
+    if (!found) ErrorHelper.NotFoundException(`Task ${id} is not found`);
 
     return found;
   }
@@ -64,14 +62,14 @@ export class TasksService {
       return mappingTask;
     } catch (error) {
       console.log({ error });
-      if (error.code === '23505') throw new ConflictException('This name already exists');
-      else throw new InternalServerErrorException();
+      if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
+      else ErrorHelper.InternalServerErrorException();
     }
   }
 
   async deleteTask(id): Promise<void> {
     const result = await this.tasksRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException(`Task ${id} is not found`);
+    if (result.affected === 0) ErrorHelper.NotFoundException(`Task ${id} is not found`);
   }
 
   async updateTask(id, updateTaskDto): Promise<Task> {
@@ -83,11 +81,12 @@ export class TasksService {
     return user;
   }
 
-  async getUserTasks(id, userTasksDto): Promise<any> {
+  async getUserTasks(id, userTasksDto): Promise<IPaginationResponse<Task>> {
     const queryBuilderRepo = await this.tasksRepository
       .createQueryBuilder('t')
-      .innerJoinAndSelect('user', 'u', 'u.id = t.userId')
-      .where('t.userId = :id', { id: id });
+      .leftJoinAndSelect('t.user', 'u')
+      .where('t.userId = :id', { id: id })
+      .select(['t', 'u.id', 'u.name']);
 
     return await this.tasksRepository.paginationQueryBuilder(queryBuilderRepo, userTasksDto);
   }

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { ObjectAny } from '../interfaces';
+import { IPagination, ObjectAny } from '../interfaces';
 
 export const assignIfHasKey = (assignedObj: ObjectAny, obj: ObjectAny) => {
   Object.entries(obj).forEach(([key, value]) => {
@@ -25,7 +25,7 @@ export const numberInputs = (
     return acc;
   }, {});
 
-export const genPagination = (page: number, perPage: number, arrayLength: number) => {
+export const genPagination = (page: number, perPage: number, arrayLength: number): IPagination => {
   return {
     page: page,
     perPage: perPage,

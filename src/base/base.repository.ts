@@ -13,7 +13,7 @@ import {
   UpdateResult,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { IPageOption } from '../interfaces';
+import { IPageOption, IPaginationResponse } from '../interfaces';
 import { genPagination, numberInputs } from '../utilities';
 import { BaseTable } from './base.entity';
 
@@ -30,20 +30,28 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
     return instanceToPlain(await this.repo.save(entities)) as Array<Model>;
   }
 
+  async find(conditions, options?: FindManyOptions<Model>): Promise<Model[]> {
+    return instanceToPlain(await this.repo.find({ where: conditions, ...options })) as Model[];
+  }
+
+  async findRaw(conditions, options?: FindOneOptions<Model>): Promise<Model[]> {
+    return await this.repo.find({ where: conditions, ...options });
+  }
+
   async findOneBy(opts?: FindOptionsWhere<Model> | FindOptionsWhere<Model>[]): Promise<Model> {
     return instanceToPlain(await this.repo.findOneBy(opts)) as Model;
+  }
+
+  async findOneByRaw(opts?: FindOptionsWhere<Model> | FindOptionsWhere<Model>[]): Promise<Model> {
+    return await this.repo.findOneBy(opts);
   }
 
   async findOne(options: FindOneOptions<Model>): Promise<Model> {
     return (await instanceToPlain(this.repo.findOne(options))) as Model;
   }
 
-  async findRaw(conditions, options?: FindOneOptions<Model>): Promise<Model[]> {
-    return this.repo.find({ where: conditions, ...options });
-  }
-
   async findOneRaw(conditions, options?: FindOneOptions<Model>): Promise<Model> {
-    return this.repo.findOne({ where: conditions, ...options });
+    return await this.repo.findOne({ where: conditions, ...options });
   }
 
   async findByIds(ids: any[]): Promise<Model[]> {
@@ -51,17 +59,19 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
       await this.repo.findBy({ id: In(ids) } as FindOptionsWhere<Model>),
     ) as Model[];
   }
-  // use findBy method instead in conjunction with In operator, for example:
 
-  // .findBy({ id: In([1, 2, 3]) })
+  async findByIdsRaw(ids: any[]): Promise<Model[]> {
+    return await this.repo.findBy({ id: In(ids) } as FindOptionsWhere<Model>);
+  }
 
   async findAndCount(options?: FindManyOptions<Model>): Promise<[Model[], number]> {
     const [items, count] = await this.repo.findAndCount(options);
     return [instanceToPlain(items) as Model[], count];
   }
 
-  async find(conditions, options?: FindManyOptions<Model>): Promise<Model[]> {
-    return instanceToPlain(await this.repo.find({ where: conditions, ...options })) as Model[];
+  async findAndCountRaw(options?: FindManyOptions<Model>): Promise<[Model[], number]> {
+    const [items, count] = await this.repo.findAndCount(options);
+    return [items, count];
   }
 
   async save(entity: Model[]): Promise<Model[]> {
@@ -84,8 +94,9 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
   async paginationRepository(
     repository: Repository<Model>,
     pageOption: IPageOption,
-    options?: any,
-  ): Promise<any> {
+    options?: FindManyOptions<Model>,
+    isRaw?: boolean,
+  ): Promise<IPaginationResponse<Model>> {
     const { page, perPage } = numberInputs(pageOption);
     const [result, total] = await repository.findAndCount({
       take: perPage || 10,
@@ -93,22 +104,25 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
       ...options,
     });
     return {
-      items: instanceToPlain(result),
+      items: isRaw ? result : instanceToPlain(result),
       pagination: genPagination(page, perPage, total),
     };
   }
 
   async paginationQueryBuilder(
     queryBuilder: SelectQueryBuilder<Model>,
-    options: IPageOption,
-  ): Promise<any> {
-    const { perPage, page } = numberInputs(options);
+    pageOptions: IPageOption,
+    isRaw?: boolean,
+  ): Promise<IPaginationResponse<Model>> {
+    const { perPage, page } = numberInputs(pageOptions);
     const total = await queryBuilder.getCount();
-    const itemsInPageRaw = queryBuilder.skip(perPage * (page - 1)).take(perPage);
-    const result = await itemsInPageRaw.getMany();
+    const result = await queryBuilder
+      .skip(perPage * (page - 1))
+      .take(perPage)
+      .getMany();
 
     return {
-      items: result,
+      items: isRaw ? result : instanceToPlain(result),
       pagination: genPagination(page, perPage, total),
     };
   }

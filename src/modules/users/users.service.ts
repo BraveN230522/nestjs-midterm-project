@@ -14,14 +14,13 @@ import { Task } from '../tasks/tasks.entity';
 import { TasksService } from '../tasks/tasks.service';
 import { User } from './users.entity';
 import { UsersRepository } from './users.repository';
+import { ErrorHelper } from '../../helpers';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UsersRepository) private usersRepository: UsersRepository,
-  ) // @Inject(forwardRef(() => TasksService))
-  // private readonly tasksService: TasksService,
-  {}
+    @InjectRepository(UsersRepository) private usersRepository: UsersRepository, // @Inject(forwardRef(() => TasksService)) // private readonly tasksService: TasksService,
+  ) {}
 
   async getUsers(filterUserDto): Promise<any> {
     const { page, perPage } = filterUserDto;
@@ -45,13 +44,13 @@ export class UsersService {
   }
 
   async getUserByUsername({ username }): Promise<User> {
-    return await this.usersRepository.findOneRaw({ username });
+    return await this.usersRepository.findOneByRaw({ username });
   }
 
   async getUser(id): Promise<User> {
     const found = await this.usersRepository.findOneBy({ id });
 
-    if (!found) throw new NotFoundException(`User ${id} is not found`);
+    if (!found) ErrorHelper.NotFoundException(`User ${id} is not found`);
 
     return found;
   }
@@ -87,14 +86,14 @@ export class UsersService {
       return user;
     } catch (error) {
       console.log({ error });
-      if (error.code === '23505') throw new ConflictException('This name already exists');
-      else throw new InternalServerErrorException();
+      if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
+      else ErrorHelper.InternalServerErrorException();
     }
   }
 
   async deleteUser(id): Promise<void> {
     const result = await this.usersRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException(`User ${id} is not found`);
+    if (result.affected === 0) ErrorHelper.NotFoundException(`User ${id} is not found`);
   }
 
   async updateUser(id, updateUserDto): Promise<User> {

@@ -1,8 +1,17 @@
 import { Exclude, Expose } from 'class-transformer';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BaseTable } from '../../base';
 import { Role, UserStatus } from '../../enums';
 import { Admin } from '../admin/admin.entity';
+import { Project } from '../projects/projects.entity';
 import { Task } from '../tasks/tasks.entity';
 
 @Entity()
@@ -49,8 +58,17 @@ export class User extends BaseTable {
   @ManyToOne(() => Admin, (admin) => admin.users, { onDelete: 'CASCADE' })
   admin: Admin;
 
-  @OneToMany(() => Task, (tasks) => tasks.user)
+  @OneToMany(() => Task, (tasks) => tasks.project)
   tasks: Task[];
+
+  @Exclude({ toPlainOnly: true })
+  @ManyToMany(() => Project, (project) => project.id, { cascade: true })
+  @JoinTable({
+    name: 'users_projects',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'projectId', referencedColumnName: 'id' },
+  })
+  projects: Project[];
 
   // @OneToOne(() => Auth, { cascade: true })
   // @JoinColumn()

@@ -20,7 +20,7 @@ export class AdminService {
   }
 
   async getAdminByUsername({ username }): Promise<Admin> {
-    return await this.adminRepository.findOneBy({ username });
+    return await this.adminRepository.findOneByRaw({ username });
   }
 
   async createAdmin(CreateAdminDto): Promise<Admin> {

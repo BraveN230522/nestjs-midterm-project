@@ -21,7 +21,6 @@ export class AdminController {
   @Get('/me')
   @RoleDecorator(Role.ADMIN)
   getCurrentUser(@UserDecorator() user): Promise<Admin> {
-    console.log({ user });
     return this.adminService.getCurrentAdmin(user);
   }
 }

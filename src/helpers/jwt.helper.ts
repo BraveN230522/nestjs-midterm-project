@@ -1,6 +1,7 @@
-import * as jwt from 'jsonwebtoken';
 import { UnauthorizedException } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
 import { Role } from '../enums';
+import { ErrorHelper } from './error.helper';
 
 export function generate(input: createToken, expiresIn: string, secret: string): string {
   const token: JWT = {
@@ -33,7 +34,7 @@ export function validate(accessToken: string, secret: string): JWT {
     const payload = jwt.verify(accessToken, secret, options);
     return payload as JWT;
   } catch (e) {
-    throw new UnauthorizedException();
+    ErrorHelper.UnauthorizedException();
   }
 }
 

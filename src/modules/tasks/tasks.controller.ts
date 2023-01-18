@@ -3,6 +3,7 @@ import { Param } from '@nestjs/common/decorators';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
+import { IPaginationResponse } from '../../interfaces';
 import { User } from '../users/users.entity';
 import { CreateTaskDto, FilterTaskDto } from './dto/tasks.dto';
 import { Task } from './tasks.entity';
@@ -44,7 +45,10 @@ export class TasksController {
 
   @Get('/users/:id')
   @RoleDecorator(Role.USER, Role.ADMIN)
-  getUserTasks(@Param('id') id, @Body() filterTaskDto: FilterTaskDto): Promise<Task[]> {
+  getUserTasks(
+    @Param('id') id,
+    @Body() filterTaskDto: FilterTaskDto,
+  ): Promise<IPaginationResponse<Task>> {
     return this.tasksService.getUserTasks(id, filterTaskDto);
   }
 }

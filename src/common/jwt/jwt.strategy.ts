@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Role } from '../../enums';
+import { ErrorHelper } from '../../helpers';
 import { JwtPayload } from '../../interfaces';
 import { Admin } from '../../modules/admin/admin.entity';
 import { AdminRepository } from '../../modules/admin/admin.repository';
@@ -21,8 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: JwtPayload): Promise<User | Admin> {
     const auth = await this.authService.validate(payload);
-    // console.log({ auth123: auth });
-    if (!auth) throw new UnauthorizedException();
+    if (!auth) ErrorHelper.UnauthorizedException();
 
     return auth;
   }

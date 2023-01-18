@@ -30,7 +30,7 @@ export class AuthService {
     const match =
       (await bcrypt.compare(password || '', found?.password || '')) && username === found?.username;
 
-    if (!match) throw new UnauthorizedException(`Username or password is incorrect`);
+    if (!match) ErrorHelper.UnauthorizedException(`Username or password is incorrect`);
 
     const payload = { username, role: found.role };
     const accessToken = await this.jwtService.sign(payload);
