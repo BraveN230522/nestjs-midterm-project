@@ -36,6 +36,7 @@ export class User extends BaseTable {
 
   @Column({
     nullable: false,
+    type: Number,
     default: UserStatus.Inactive,
   })
   status: UserStatus;

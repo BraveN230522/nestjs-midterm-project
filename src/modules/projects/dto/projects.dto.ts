@@ -1,13 +1,5 @@
-import {
-  IsDateString,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
-import { UserStatus } from '../../../enums';
+import { IsDateString, IsNotEmpty, IsOptional, MinDate, ValidateIf } from 'class-validator';
+import moment from 'moment';
 
 export class CreateProjectDto {
   @IsNotEmpty()
@@ -17,11 +9,19 @@ export class CreateProjectDto {
   slug: string;
 
   @IsNotEmpty()
-  @IsDateString({}, { message: 'The start date from should be date' })
+  // @IsDateString({}, { message: 'The start date from should be date' })
+  @ValidateIf((obj) => {
+    const endDate = moment(obj.endDate, 'YYYY-MM-DD').toISOString();
+    const startDate = moment(obj.startDate, 'YYYY-MM-DD').toISOString();
+    const diffTime = moment(startDate).diff(endDate);
+
+    console.log({ diffTime });
+    return diffTime ? diffTime <= 0 : true;
+  })
   startDate: string;
 
   @IsNotEmpty()
-  @IsDateString({}, { message: 'The end date from should be date' })
+  // @IsDateString({}, { message: 'The end date from should be date' })
   endDate: string;
 }
 

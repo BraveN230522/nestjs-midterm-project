@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
@@ -35,6 +35,12 @@ export class ProjectsController {
   }
 
   @RoleDecorator(Role.ADMIN, Role.USER)
+  @Delete('/:id')
+  deleteProject(@Param('id') id): Promise<any> {
+    return this.projectsService.deleteProject(id);
+  }
+
+  @RoleDecorator(Role.ADMIN, Role.USER)
   @Get('/members/:id')
   getProjectMembers(
     @Param('id') id,
@@ -47,5 +53,11 @@ export class ProjectsController {
   @Patch('/members/:id')
   addMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project> {
     return this.projectsService.addMembers(ids, id);
+  }
+
+  @RoleDecorator(Role.ADMIN, Role.USER)
+  @Delete('/members/:id')
+  removeMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project> {
+    return this.projectsService.removeMembers(ids, id);
   }
 }

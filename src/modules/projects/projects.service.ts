@@ -5,6 +5,7 @@ import slugify from 'slugify';
 import { PAGE_NO_LIMIT } from '../../constants';
 import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
+import { User } from '../users/users.entity';
 import { UsersRepository } from '../users/users.repository';
 import { ErrorHelper } from './../../helpers/error.helper';
 import { CreateProjectDto } from './dto/projects.dto';
@@ -59,14 +60,13 @@ export class ProjectsService {
     return found;
   }
 
-  async getProjectMembers(id, getProjectsDto): Promise<any> {
+  async getProjectMembers(id, getProjectsDto): Promise<IPaginationResponse<User>> {
+    await this.getProject(id);
+
     const queryBuilderRepo = await this.usersRepository
       .createQueryBuilder('u')
       .leftJoinAndSelect('u.projects', 'projects')
       .where('projects.id = :projectId', { projectId: id });
-    // .select(['t', 'u.id', 'u.name'])
-
-    // return queryBuilderRepo;
 
     return await this.usersRepository.paginationQueryBuilder(
       queryBuilderRepo,
@@ -81,10 +81,37 @@ export class ProjectsService {
     const membersOfProject = await this.getProjectMembers(id, PAGE_NO_LIMIT);
     const project = await this.getProject(id);
 
-    const memberShouldBeAdded = _.differenceBy(membersOfProject.items, users, 'id');
+    const memberShouldBeAdded = _.differenceBy(users, membersOfProject.items as User[], 'id');
+    console.log({ memberShouldBeAdded, users });
 
-    assignIfHasKey(project, { users: [...membersOfProject.items, ...memberShouldBeAdded] });
+    assignIfHasKey(project, {
+      users: [...(membersOfProject.items as User[]), ...memberShouldBeAdded],
+    });
 
     return await this.projectsRepository.save([project]);
+  }
+
+  async removeMembers(ids, id): Promise<any> {
+    const memberIds: number[] = JSON.parse(ids);
+    const users = await this.usersRepository.findByIds(memberIds);
+    const membersOfProject = await this.getProjectMembers(id, PAGE_NO_LIMIT);
+    const project = await this.getProject(id);
+
+    const memberAfterRemoving = _.differenceBy(membersOfProject.items as User[], users, 'id');
+    assignIfHasKey(project, { users: memberAfterRemoving });
+
+    return await this.projectsRepository.save([project]);
+  }
+
+  async deleteProject(id) {
+    const result = await this.projectsRepository.delete(id);
+    // .createQueryBuilder('p')
+    // .where('id = :pId', { pId: id })
+    // .delete()
+    // .execute();
+
+    if (result.affected === 0) ErrorHelper.NotFoundException(`Project ${id} is not found`);
+
+    return 'Delete project successfully';
   }
 }

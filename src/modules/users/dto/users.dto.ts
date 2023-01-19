@@ -1,4 +1,14 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumberString,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { UserStatus } from '../../../enums';
 
 export class CreateUserDto {
@@ -16,6 +26,9 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsEnum(UserStatus)
+  @Transform(({ value }) => Number.parseInt(value))
+  @Type(() => Number)
+  @IsInt()
   status: UserStatus;
 
   @IsOptional()

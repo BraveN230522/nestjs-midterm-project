@@ -8,6 +8,7 @@ import {
   FindOneOptions,
   FindOptionsWhere,
   In,
+  ObjectID,
   Repository,
   SelectQueryBuilder,
   UpdateResult,
@@ -82,7 +83,7 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
   }
 
   async delete(
-    criteria: string | string[] | number | number[] | Date | Date[],
+    criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindOptionsWhere<Model>,
   ): Promise<DeleteResult> {
     return this.repo.delete(criteria);
   }

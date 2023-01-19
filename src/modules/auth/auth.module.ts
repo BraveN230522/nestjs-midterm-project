@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '../../common';
 import { JwtStrategy } from '../../common/jwt/jwt.strategy';
+import { AppConfigModule, AppConfigService } from '../../configuration';
 import { AdminModule } from '../admin/admin.module';
 import { AdminService } from '../admin/admin.service';
 import { TasksModule } from '../tasks/tasks.module';
@@ -14,11 +15,19 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     PassportModule,
-    JwtModule.register({
-      secret: 'top',
-      signOptions: {
-        expiresIn: 3600,
-      },
+    JwtModule.registerAsync({
+      // secret: 'top',
+      // signOptions: {
+      //   expiresIn: 3600,
+      // },
+      imports: [AppConfigModule],
+      useFactory: async (configService: AppConfigService) => ({
+        secret: configService.accessTokenSecret,
+        signOptions: {
+          expiresIn: configService.accessTokenExpires,
+        },
+      }),
+      inject: [AppConfigService],
     }),
     // TypeOrmModule.forFeature([UsersRepository, AdminRepository]),
     UsersModule,
