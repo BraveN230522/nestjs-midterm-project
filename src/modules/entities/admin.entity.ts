@@ -3,7 +3,7 @@ import { IsDate } from 'class-validator';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTable } from '../../base';
 import { Role } from '../../enums';
-import { User } from '../users/users.entity';
+import { User } from './users.entity';
 
 @Entity()
 export class Admin extends BaseTable {

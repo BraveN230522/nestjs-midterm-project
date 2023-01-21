@@ -5,11 +5,11 @@ import slugify from 'slugify';
 import { PAGE_NO_LIMIT } from '../../constants';
 import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
-import { User } from '../users/users.entity';
+import { Project } from '../entities/projects.entity';
+import { User } from '../entities/users.entity';
 import { UsersRepository } from '../users/users.repository';
 import { ErrorHelper } from './../../helpers/error.helper';
 import { CreateProjectDto } from './dto/projects.dto';
-import { Project } from './projects.entity';
 import { ProjectsRepository } from './projects.repository';
 
 @Injectable()

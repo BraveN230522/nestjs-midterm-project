@@ -4,9 +4,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
 import { IPaginationResponse } from '../../interfaces';
-import { User } from '../users/users.entity';
+import { Task } from '../entities/tasks.entity';
+import { User } from '../entities/users.entity';
 import { CreateTaskDto, FilterTaskDto } from './dto/tasks.dto';
-import { Task } from './tasks.entity';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')

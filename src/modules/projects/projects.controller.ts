@@ -4,9 +4,9 @@ import { RoleDecorator } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 import { Role } from '../../enums';
 import { IPaginationResponse } from '../../interfaces';
-import { User } from './../users/users.entity';
+import { Project } from '../entities/projects.entity';
+import { User } from '../entities/users.entity';
 import { CreateProjectDto, GetProjectsDto } from './dto/projects.dto';
-import { Project } from './projects.entity';
 import { ProjectsService } from './projects.service';
 
 // import { CreateProjectDto, FilterProjectDto, ProjectProjectsDto } from './dto/projects.dto';

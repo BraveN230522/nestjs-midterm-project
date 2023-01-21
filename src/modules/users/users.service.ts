@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import { ErrorHelper } from '../../helpers';
 import { assignIfHasKey } from '../../utilities';
-import { User } from './users.entity';
+import { User } from '../entities/users.entity';
 import { UsersRepository } from './users.repository';
 
 @Injectable()

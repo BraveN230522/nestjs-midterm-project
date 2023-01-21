@@ -12,10 +12,10 @@ import { FindOneOptions } from 'typeorm';
 import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
-import { User } from '../users/users.entity';
+import { Task } from '../entities/tasks.entity';
+import { User } from '../entities/users.entity';
 import { UsersService } from '../users/users.service';
 import { CreateTaskDto } from './dto/tasks.dto';
-import { Task } from './tasks.entity';
 import { TasksRepository } from './tasks.repository';
 
 @Injectable()

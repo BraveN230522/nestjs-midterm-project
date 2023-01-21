@@ -1,8 +1,8 @@
 import { Exclude } from 'class-transformer';
 import { Column, CreateDateColumn, Entity, ManyToOne, UpdateDateColumn } from 'typeorm';
 import { BaseTable } from '../../base';
-import { Project } from '../projects/projects.entity';
-import { User } from '../users/users.entity';
+import { Project } from './projects.entity';
+import { User } from './users.entity';
 
 @Entity()
 export class Task extends BaseTable {

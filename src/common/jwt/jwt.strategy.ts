@@ -4,9 +4,9 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AppConfigService } from '../../configuration';
 import { ErrorHelper } from '../../helpers';
 import { JwtPayload } from '../../interfaces';
-import { Admin } from '../../modules/admin/admin.entity';
 import { AuthService } from '../../modules/auth/auth.service';
-import { User } from '../../modules/users/users.entity';
+import { Admin } from '../../modules/entities/admin.entity';
+import { User } from '../../modules/entities/users.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

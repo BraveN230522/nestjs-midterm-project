@@ -3,12 +3,12 @@ import { Body, Get, Post, UseGuards } from '@nestjs/common/decorators';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
-import { Admin } from './admin.entity';
+import { Admin } from '../entities/admin.entity';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/admin.dto';
 
 @Controller('admin')
-@UseGuards(AuthGuard(), RolesGuard)
+// @UseGuards(AuthGuard(), RolesGuard)
 export class AdminController {
   constructor(private adminService: AdminService) {}
 

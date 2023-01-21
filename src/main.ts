@@ -14,7 +14,6 @@ async function bootstrap() {
   const upload = multer();
   const configService = app.get<ConfigService>(ConfigService);
   const appConfigService = app.get(AppConfigService);
-
   // for parsing application/json
   app.use(express.json());
 

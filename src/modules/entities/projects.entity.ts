@@ -1,7 +1,7 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { BaseTable } from '../../base';
-import { Task } from '../tasks/tasks.entity';
-import { User } from '../users/users.entity';
+import { Task } from './tasks.entity';
+import { User } from './users.entity';
 
 @Entity()
 export class Project extends BaseTable {

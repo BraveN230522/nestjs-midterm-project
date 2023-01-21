@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '../../common';
-import { Task } from '../tasks/tasks.entity';
+import { Task } from '../entities/tasks.entity';
+import { User } from '../entities/users.entity';
 import { TasksModule } from '../tasks/tasks.module';
 import { TasksService } from '../tasks/tasks.service';
-import { User } from './Users.entity';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';

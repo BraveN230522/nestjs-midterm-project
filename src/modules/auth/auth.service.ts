@@ -4,9 +4,9 @@ import bcrypt from 'bcrypt';
 import _ from 'lodash';
 import { Role } from '../../enums';
 import { ErrorHelper } from '../../helpers';
-import { Admin } from '../admin/admin.entity';
 import { AdminService } from '../admin/admin.service';
-import { User } from '../users/users.entity';
+import { Admin } from '../entities/admin.entity';
+import { User } from '../entities/users.entity';
 import { UsersService } from '../users/users.service';
 
 @Injectable()

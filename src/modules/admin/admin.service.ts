@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import { ErrorHelper } from '../../helpers';
 import { assignIfHasKey } from '../../utilities';
-import { Admin } from './admin.entity';
+import { Admin } from '../entities/admin.entity';
 import { AdminRepository } from './admin.repository';
 import { UpdateAdminDto } from './dto/admin.dto';
 

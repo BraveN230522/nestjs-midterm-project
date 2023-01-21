@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '../../common';
-import { User } from '../users/users.entity';
+import { Admin } from '../entities/admin.entity';
+import { User } from '../entities/users.entity';
 import { AdminController } from './admin.controller';
-import { Admin } from './admin.entity';
 import { AdminRepository } from './admin.repository';
 import { AdminService } from './admin.service';
 

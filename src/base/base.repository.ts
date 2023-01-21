@@ -83,7 +83,16 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
   }
 
   async delete(
-    criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindOptionsWhere<Model>,
+    criteria:
+      | string
+      | string[]
+      | number
+      | number[]
+      | Date
+      | Date[]
+      | ObjectID
+      | ObjectID[]
+      | FindOptionsWhere<Model>,
   ): Promise<DeleteResult> {
     return this.repo.delete(criteria);
   }
