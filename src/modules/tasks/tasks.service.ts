@@ -88,6 +88,6 @@ export class TasksService {
       .where('t.userId = :id', { id: id })
       .select(['t', 'u.id', 'u.name']);
 
-    return await this.tasksRepository.paginationQueryBuilder(queryBuilderRepo, userTasksDto);
+    return await this.tasksRepository.paginationQueryBuilder(queryBuilderRepo, userTasksDto, true);
   }
 }

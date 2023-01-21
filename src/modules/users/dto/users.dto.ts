@@ -1,5 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  IsArray,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -13,18 +14,51 @@ import { UserStatus } from '../../../enums';
 
 export class CreateUserDto {
   @IsNotEmpty()
+  @IsInt({ each: true })
+  @Transform((params) => params.value.split(',').map(Number))
+  defaultProjects: number[];
+
+  // @IsNotEmpty()
+  // name: string;
+
+  // @IsNotEmpty()
+  // username: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // @MinLength(3)
+  // @MaxLength(32)
+  // password: string;
+
+  // @IsNotEmpty()
+  // @IsEnum(UserStatus)
+  // @Transform(({ value }) => Number.parseInt(value))
+  // @Type(() => Number)
+  // @IsInt()
+  // status: UserStatus;
+
+  // @IsOptional()
+  // token: string;
+}
+export class UpdateUserDto {
+  @IsOptional()
+  @IsInt({ each: true })
+  @Transform((params) => params.value.split(',').map(Number))
+  defaultProjects: number[];
+
+  @IsOptional()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   username: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(3)
   @MaxLength(32)
   password: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(UserStatus)
   @Transform(({ value }) => Number.parseInt(value))
   @Type(() => Number)

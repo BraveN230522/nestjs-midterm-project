@@ -42,13 +42,4 @@ export class TasksController {
   // ): Promise<Task> {
   //   return this.tasksService.updateTask(id, updateTaskDto);
   // }
-
-  @Get('/users/:id')
-  @RoleDecorator(Role.USER, Role.ADMIN)
-  getUserTasks(
-    @Param('id') id,
-    @Body() filterTaskDto: FilterTaskDto,
-  ): Promise<IPaginationResponse<Task>> {
-    return this.tasksService.getUserTasks(id, filterTaskDto);
-  }
 }

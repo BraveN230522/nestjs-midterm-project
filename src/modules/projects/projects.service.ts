@@ -75,7 +75,16 @@ export class ProjectsService {
     );
   }
 
-  async addMembers(ids, id): Promise<any> {
+  async updateProject(id, updateProjectDto): Promise<Project> {
+    const project = await this.getProject(id);
+    assignIfHasKey(project, updateProjectDto);
+
+    await this.projectsRepository.save([project]);
+
+    return project;
+  }
+
+  async addMembers(ids, id): Promise<Project[]> {
     const memberIds: number[] = JSON.parse(ids);
     const users = await this.usersRepository.findByIds(memberIds);
     const membersOfProject = await this.getProjectMembers(id, PAGE_NO_LIMIT);
@@ -91,7 +100,7 @@ export class ProjectsService {
     return await this.projectsRepository.save([project]);
   }
 
-  async removeMembers(ids, id): Promise<any> {
+  async removeMembers(ids, id): Promise<Project[]> {
     const memberIds: number[] = JSON.parse(ids);
     const users = await this.usersRepository.findByIds(memberIds);
     const membersOfProject = await this.getProjectMembers(id, PAGE_NO_LIMIT);
@@ -113,5 +122,19 @@ export class ProjectsService {
     if (result.affected === 0) ErrorHelper.NotFoundException(`Project ${id} is not found`);
 
     return 'Delete project successfully';
+  }
+
+  async getUserProjects(id, userTasksDto): Promise<IPaginationResponse<Project>> {
+    const queryBuilderRepo = await this.projectsRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.users', 'u')
+      .where('u.id = :userId', { userId: id })
+      .select(['p']);
+
+    return await this.projectsRepository.paginationQueryBuilder(
+      queryBuilderRepo,
+      userTasksDto,
+      true,
+    );
   }
 }

@@ -25,6 +25,30 @@ export class CreateProjectDto {
   endDate: string;
 }
 
+export class UpdateProjectDto {
+  @IsOptional()
+  name: string;
+
+  @IsOptional()
+  slug: string;
+
+  @IsOptional()
+  // @IsDateString({}, { message: 'The start date from should be date' })
+  @ValidateIf((obj) => {
+    const endDate = moment(obj.endDate, 'YYYY-MM-DD').toISOString();
+    const startDate = moment(obj.startDate, 'YYYY-MM-DD').toISOString();
+    const diffTime = moment(startDate).diff(endDate);
+
+    console.log({ diffTime });
+    return diffTime ? diffTime <= 0 : true;
+  })
+  startDate: string;
+
+  @IsOptional()
+  // @IsDateString({}, { message: 'The end date from should be date' })
+  endDate: string;
+}
+
 export class GetProjectsDto {
   @IsOptional()
   page: string;

@@ -6,7 +6,7 @@ import { Role } from '../../enums';
 import { IPaginationResponse } from '../../interfaces';
 import { Project } from '../entities/projects.entity';
 import { User } from '../entities/users.entity';
-import { CreateProjectDto, GetProjectsDto } from './dto/projects.dto';
+import { CreateProjectDto, GetProjectsDto, UpdateProjectDto } from './dto/projects.dto';
 import { ProjectsService } from './projects.service';
 
 // import { CreateProjectDto, FilterProjectDto, ProjectProjectsDto } from './dto/projects.dto';
@@ -34,6 +34,12 @@ export class ProjectsController {
     return this.projectsService.getProject(id);
   }
 
+  @Patch('/:id')
+  @RoleDecorator(Role.ADMIN)
+  updateProject(@Param('id') id, @Body() updateProjectDto: UpdateProjectDto): Promise<Project> {
+    return this.projectsService.updateProject(id, updateProjectDto);
+  }
+
   @RoleDecorator(Role.ADMIN, Role.USER)
   @Delete('/:id')
   deleteProject(@Param('id') id): Promise<any> {
@@ -51,13 +57,13 @@ export class ProjectsController {
 
   @RoleDecorator(Role.ADMIN, Role.USER)
   @Patch('/members/:id')
-  addMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project> {
+  addMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project[]> {
     return this.projectsService.addMembers(ids, id);
   }
 
   @RoleDecorator(Role.ADMIN, Role.USER)
   @Delete('/members/:id')
-  removeMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project> {
+  removeMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project[]> {
     return this.projectsService.removeMembers(ids, id);
   }
 }

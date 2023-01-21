@@ -15,9 +15,13 @@ import _ from 'lodash';
 import { RoleDecorator, UserDecorator } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 import { Role } from '../../enums';
+import { IPaginationResponse } from '../../interfaces';
 import { Task } from '../entities/tasks.entity';
 import { User } from '../entities/users.entity';
-import { CreateUserDto, FilterUserDto, UserTasksDto } from './dto/users.dto';
+import { ProjectsService } from '../projects/projects.service';
+import { FilterTaskDto } from '../tasks/dto/tasks.dto';
+import { TasksService } from '../tasks/tasks.service';
+import { CreateUserDto, FilterUserDto, UpdateUserDto, UserTasksDto } from './dto/users.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -25,7 +29,11 @@ import { UsersService } from './users.service';
 @UseGuards(AuthGuard(), RolesGuard)
 @RoleDecorator(Role.SUPER_ADMIN)
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private tasksService: TasksService,
+    private projectsService: ProjectsService,
+  ) {}
 
   @Get()
   @RoleDecorator(Role.USER, Role.ADMIN)
@@ -52,12 +60,32 @@ export class UsersController {
   }
 
   @Delete('/:id')
+  @RoleDecorator(Role.ADMIN)
   deleteUser(@Param('id') id): Promise<void> {
     return this.usersService.deleteUser(id);
   }
 
   @Patch('/:id')
-  updateUser(@Param('id') id, @Body() updateUserDto: CreateUserDto): Promise<User> {
+  @RoleDecorator(Role.ADMIN)
+  updateUser(@Param('id') id, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
+  }
+
+  @Get('/tasks/:id')
+  @RoleDecorator(Role.USER, Role.ADMIN)
+  getUserTasks(
+    @Param('id') id,
+    @Body() filterTaskDto: FilterTaskDto,
+  ): Promise<IPaginationResponse<Task>> {
+    return this.tasksService.getUserTasks(id, filterTaskDto);
+  }
+
+  @Get('/projects/:id')
+  @RoleDecorator(Role.USER, Role.ADMIN)
+  getUserProjects(
+    @Param('id') id,
+    @Body() filterTaskDto: FilterTaskDto,
+  ): Promise<IPaginationResponse<Task>> {
+    return this.projectsService.getUserProjects(id, filterTaskDto);
   }
 }

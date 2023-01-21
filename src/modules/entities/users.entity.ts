@@ -21,17 +21,23 @@ export class User extends BaseTable {
     Object.assign(this, partial);
   }
 
-  @Column()
+  @Column({
+    nullable: true,
+    unique: false,
+  })
   name?: string;
 
   @Column({
-    nullable: false,
+    nullable: true,
     unique: true,
   })
-  username: string;
+  username?: string;
 
   @Exclude({ toPlainOnly: true })
-  @Column()
+  @Column({
+    nullable: true,
+    unique: false,
+  })
   password?: string;
 
   @Column({

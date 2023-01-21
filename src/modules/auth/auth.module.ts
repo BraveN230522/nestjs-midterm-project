@@ -5,6 +5,7 @@ import { JwtStrategy } from '../../common/jwt/jwt.strategy';
 import { AppConfigModule, AppConfigService } from '../../configuration';
 import { AdminModule } from '../admin/admin.module';
 import { AdminService } from '../admin/admin.service';
+import { ProjectsModule } from '../projects/projects.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { TasksService } from '../tasks/tasks.service';
 import { UsersModule } from '../users/users.module';
@@ -33,6 +34,7 @@ import { AuthService } from './auth.service';
     UsersModule,
     AdminModule,
     TasksModule,
+    ProjectsModule,
   ],
   providers: [AuthService, UsersService, AdminService, JwtStrategy, TasksService],
   controllers: [AuthController],

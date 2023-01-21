@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
+import _ from 'lodash';
 import { ErrorHelper } from '../../helpers';
 import { assignIfHasKey } from '../../utilities';
 import { User } from '../entities/users.entity';
+import { ProjectsRepository } from '../projects/projects.repository';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersRepository) private usersRepository: UsersRepository, // @Inject(forwardRef(() => TasksService)) // private readonly tasksService: TasksService,
+    private projectsRepository: ProjectsRepository,
   ) {}
 
   async getUsers(filterUserDto): Promise<any> {
@@ -37,23 +40,20 @@ export class UsersService {
     return user;
   }
 
-  async createUser(createUserDto): Promise<User> {
+  async createUser(createUserDto): Promise<any> {
     try {
-      const { name, status, username, password } = createUserDto;
-      console.log({ status });
-      const salt = bcrypt.genSaltSync(1);
-      const hashedPassword = bcrypt.hashSync(password, salt);
+      const { defaultProjects } = createUserDto;
+      const projects = await this.projectsRepository.findByIds(defaultProjects);
 
       const user = this.usersRepository.create({
-        name,
-        username,
-        password: hashedPassword,
-        status: status,
+        projects: projects,
       });
 
       await this.usersRepository.save([user]);
 
-      return user;
+      const mappingUser = _.omit(user, ['projects']);
+
+      return mappingUser;
     } catch (error) {
       console.log({ error });
       if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
