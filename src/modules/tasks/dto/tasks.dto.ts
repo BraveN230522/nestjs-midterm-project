@@ -14,7 +14,7 @@ export class CreateTaskDto {
   endDate: string;
 }
 
-export class FilterTaskDto {
+export class GetTaskDto {
   @IsOptional()
   page: string;
 

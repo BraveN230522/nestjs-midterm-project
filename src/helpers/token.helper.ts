@@ -1,5 +1,4 @@
 import * as jwt from 'jsonwebtoken';
-
 import { ErrorHelper } from './error.helper';
 
 /**
@@ -45,8 +44,10 @@ export class TokenHelper {
       const payload = jwt.verify(token, secret, options);
       return payload as any;
     } catch (error) {
-      if (error.name === 'TokenExpiredError') ErrorHelper.UnauthorizedException('Access token expired');
-      if (error.name === 'JsonWebTokenError') ErrorHelper.UnauthorizedException('Access token not valid');
+      if (error.name === 'TokenExpiredError')
+        ErrorHelper.UnauthorizedException('Access token expired');
+      if (error.name === 'JsonWebTokenError')
+        ErrorHelper.UnauthorizedException('Access token not valid');
       throw error;
     }
   }

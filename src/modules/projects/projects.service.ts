@@ -61,7 +61,7 @@ export class ProjectsService {
     return found;
   }
 
-  async getProjectMembers(id, getProjectsDto): Promise<IPaginationResponse<User>> {
+  async getProjectMembers(id, getProjectMembersDto): Promise<IPaginationResponse<User>> {
     await this.getProject(id);
 
     const queryBuilderRepo = await this.usersRepository
@@ -71,7 +71,7 @@ export class ProjectsService {
 
     return await this.usersRepository.paginationQueryBuilder(
       queryBuilderRepo,
-      getProjectsDto,
+      getProjectMembersDto,
       false,
     );
   }
@@ -124,7 +124,7 @@ export class ProjectsService {
     return APP_MESSAGE.DELETED_PROJECT;
   }
 
-  async getUserProjects(id, userTasksDto): Promise<IPaginationResponse<Project>> {
+  async getUserProjects(id, getUserProjectsDto): Promise<IPaginationResponse<Project>> {
     const queryBuilderRepo = await this.projectsRepository
       .createQueryBuilder('p')
       .leftJoin('p.users', 'u')
@@ -133,7 +133,7 @@ export class ProjectsService {
 
     return await this.projectsRepository.paginationQueryBuilder(
       queryBuilderRepo,
-      userTasksDto,
+      getUserProjectsDto,
       true,
     );
   }

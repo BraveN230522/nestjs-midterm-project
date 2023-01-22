@@ -15,8 +15,8 @@ export class UsersService {
     private projectsRepository: ProjectsRepository,
   ) {}
 
-  async getUsers(filterUserDto): Promise<any> {
-    const { page, perPage } = filterUserDto;
+  async getUsers(getUserDto): Promise<any> {
+    const { page, perPage } = getUserDto;
 
     return this.usersRepository.paginationRepository(this.usersRepository, {
       page,

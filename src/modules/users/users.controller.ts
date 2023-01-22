@@ -1,17 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { instanceToPlain } from 'class-transformer';
-import _ from 'lodash';
 import { RoleDecorator, UserDecorator } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 import { Role } from '../../enums';
@@ -19,9 +7,14 @@ import { IPaginationResponse } from '../../interfaces';
 import { Task } from '../entities/tasks.entity';
 import { User } from '../entities/users.entity';
 import { ProjectsService } from '../projects/projects.service';
-import { FilterTaskDto } from '../tasks/dto/tasks.dto';
 import { TasksService } from '../tasks/tasks.service';
-import { CreateUserDto, FilterUserDto, UpdateUserDto, UserTasksDto } from './dto/users.dto';
+import {
+  CreateUserDto,
+  GetUserDto,
+  GetUserProjectsDto,
+  GetUserTasksDto,
+  UpdateUserDto,
+} from './dto/users.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -37,8 +30,8 @@ export class UsersController {
 
   @Get()
   @RoleDecorator(Role.USER, Role.ADMIN)
-  getUsers(@Body() filterUserDto: FilterUserDto) {
-    return this.usersService.getUsers(filterUserDto);
+  getUsers(@Body() getUserDto: GetUserDto) {
+    return this.usersService.getUsers(getUserDto);
   }
 
   @Get('/me')
@@ -75,17 +68,17 @@ export class UsersController {
   @RoleDecorator(Role.USER, Role.ADMIN)
   getUserTasks(
     @Param('id') id,
-    @Body() filterTaskDto: FilterTaskDto,
+    @Body() getUserTasksDto: GetUserTasksDto,
   ): Promise<IPaginationResponse<Task>> {
-    return this.tasksService.getUserTasks(id, filterTaskDto);
+    return this.tasksService.getUserTasks(id, getUserTasksDto);
   }
 
   @Get('/projects/:id')
   @RoleDecorator(Role.USER, Role.ADMIN)
   getUserProjects(
     @Param('id') id,
-    @Body() filterTaskDto: FilterTaskDto,
+    @Body() getUserProjectsDto: GetUserProjectsDto,
   ): Promise<IPaginationResponse<Task>> {
-    return this.projectsService.getUserProjects(id, filterTaskDto);
+    return this.projectsService.getUserProjects(id, getUserProjectsDto);
   }
 }

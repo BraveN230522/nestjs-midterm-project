@@ -9,6 +9,7 @@ import { User } from '../entities/users.entity';
 import {
   AddMembersDto,
   CreateProjectDto,
+  GetProjectMembersDto,
   GetProjectsDto,
   RemoveMembersDto,
   UpdateProjectDto,
@@ -56,9 +57,9 @@ export class ProjectsController {
   @Get('/members/:id')
   getProjectMembers(
     @Param('id') id,
-    @Body() getProjectsDto: GetProjectsDto,
+    @Body() getProjectMembersDto: GetProjectMembersDto,
   ): Promise<IPaginationResponse<User>> {
-    return this.projectsService.getProjectMembers(id, getProjectsDto);
+    return this.projectsService.getProjectMembers(id, getProjectMembersDto);
   }
 
   @RoleDecorator(Role.ADMIN, Role.USER)

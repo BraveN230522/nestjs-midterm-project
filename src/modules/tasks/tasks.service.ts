@@ -27,8 +27,8 @@ export class TasksService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getTasks(filterTaskDto): Promise<IPaginationResponse<Task>> {
-    const { page, perPage } = filterTaskDto;
+  async getTasks(getTaskDto): Promise<IPaginationResponse<Task>> {
+    const { page, perPage } = getTaskDto;
     return this.tasksRepository.paginationRepository(this.tasksRepository, {
       page,
       perPage,
@@ -81,13 +81,17 @@ export class TasksService {
     return user;
   }
 
-  async getUserTasks(id, userTasksDto): Promise<IPaginationResponse<Task>> {
+  async getUserTasks(id, getUserTasksDto): Promise<IPaginationResponse<Task>> {
     const queryBuilderRepo = await this.tasksRepository
       .createQueryBuilder('t')
       .leftJoinAndSelect('t.user', 'u')
       .where('t.userId = :id', { id: id })
       .select(['t', 'u.id', 'u.name']);
 
-    return await this.tasksRepository.paginationQueryBuilder(queryBuilderRepo, userTasksDto, true);
+    return await this.tasksRepository.paginationQueryBuilder(
+      queryBuilderRepo,
+      getUserTasksDto,
+      true,
+    );
   }
 }

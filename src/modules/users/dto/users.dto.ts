@@ -69,7 +69,7 @@ export class UpdateUserDto {
   token: string;
 }
 
-export class FilterUserDto {
+export class GetUserDto {
   @IsOptional()
   page: string;
 
@@ -77,7 +77,15 @@ export class FilterUserDto {
   perPage: string;
 }
 
-export class UserTasksDto {
+export class GetUserTasksDto {
+  @IsOptional()
+  page: string;
+
+  @IsOptional()
+  perPage: string;
+}
+
+export class GetUserProjectsDto {
   @IsOptional()
   page: string;
 

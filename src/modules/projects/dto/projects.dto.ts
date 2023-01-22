@@ -76,7 +76,7 @@ export class GetProjectsDto {
   perPage: string;
 }
 
-export class UserTasksDto {
+export class GetProjectMembersDto {
   @IsOptional()
   page: string;
 
@@ -84,6 +84,10 @@ export class UserTasksDto {
   perPage: string;
 }
 
-// export class GetUserDto {
-//   uuid: string;
-// }
+export class UserTasksDto {
+  @IsOptional()
+  page: string;
+
+  @IsOptional()
+  perPage: string;
+}

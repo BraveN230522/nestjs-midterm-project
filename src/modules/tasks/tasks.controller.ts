@@ -1,12 +1,10 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { Param } from '@nestjs/common/decorators';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
-import { IPaginationResponse } from '../../interfaces';
 import { Task } from '../entities/tasks.entity';
 import { User } from '../entities/users.entity';
-import { CreateTaskDto, FilterTaskDto } from './dto/tasks.dto';
+import { CreateTaskDto, GetTaskDto } from './dto/tasks.dto';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
@@ -15,8 +13,8 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  getTasks(@Body() filterTaskDto: FilterTaskDto) {
-    return this.tasksService.getTasks(filterTaskDto);
+  getTasks(@Body() getTaskDto: GetTaskDto) {
+    return this.tasksService.getTasks(getTaskDto);
   }
 
   // @Get('/:id')
