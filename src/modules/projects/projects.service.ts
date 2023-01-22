@@ -4,6 +4,7 @@ import _ from 'lodash';
 import slugify from 'slugify';
 import { PAGE_NO_LIMIT } from '../../constants';
 import { IPaginationResponse } from '../../interfaces';
+import { APP_MESSAGE } from '../../messages';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
 import { Project } from '../entities/projects.entity';
 import { User } from '../entities/users.entity';
@@ -84,24 +85,23 @@ export class ProjectsService {
     return project;
   }
 
-  async addMembers(ids, id): Promise<Project[]> {
-    const memberIds: number[] = JSON.parse(ids);
+  async addMembers(addMembersDto, id): Promise<string> {
+    const { memberIds } = addMembersDto;
     const users = await this.usersRepository.findByIds(memberIds);
     const membersOfProject = await this.getProjectMembers(id, PAGE_NO_LIMIT);
     const project = await this.getProject(id);
 
     const memberShouldBeAdded = _.differenceBy(users, membersOfProject.items as User[], 'id');
-    console.log({ memberShouldBeAdded, users });
 
     assignIfHasKey(project, {
       users: [...(membersOfProject.items as User[]), ...memberShouldBeAdded],
     });
 
-    return await this.projectsRepository.save([project]);
+    return APP_MESSAGE.ADDED_MEMBER;
   }
 
-  async removeMembers(ids, id): Promise<Project[]> {
-    const memberIds: number[] = JSON.parse(ids);
+  async removeMembers(removeMembersDto, id): Promise<string> {
+    const { memberIds } = removeMembersDto;
     const users = await this.usersRepository.findByIds(memberIds);
     const membersOfProject = await this.getProjectMembers(id, PAGE_NO_LIMIT);
     const project = await this.getProject(id);
@@ -109,7 +109,7 @@ export class ProjectsService {
     const memberAfterRemoving = _.differenceBy(membersOfProject.items as User[], users, 'id');
     assignIfHasKey(project, { users: memberAfterRemoving });
 
-    return await this.projectsRepository.save([project]);
+    return APP_MESSAGE.REMOVED_MEMBER;
   }
 
   async deleteProject(id) {
@@ -121,7 +121,7 @@ export class ProjectsService {
 
     if (result.affected === 0) ErrorHelper.NotFoundException(`Project ${id} is not found`);
 
-    return 'Delete project successfully';
+    return APP_MESSAGE.DELETED_PROJECT;
   }
 
   async getUserProjects(id, userTasksDto): Promise<IPaginationResponse<Project>> {

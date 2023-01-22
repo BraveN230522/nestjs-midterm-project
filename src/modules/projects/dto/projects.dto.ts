@@ -1,4 +1,5 @@
-import { IsDateString, IsNotEmpty, IsOptional, MinDate, ValidateIf } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsDateString, IsInt, IsNotEmpty, IsOptional, MinDate, ValidateIf } from 'class-validator';
 import moment from 'moment';
 
 export class CreateProjectDto {
@@ -47,6 +48,24 @@ export class UpdateProjectDto {
   @IsOptional()
   // @IsDateString({}, { message: 'The end date from should be date' })
   endDate: string;
+}
+
+export class AddMembersDto {
+  @IsNotEmpty()
+  @IsInt({ each: true })
+  @Transform((params) => {
+    return params.value.split(',').map(Number);
+  })
+  memberIds: number[];
+}
+
+export class RemoveMembersDto {
+  @IsNotEmpty()
+  @IsInt({ each: true })
+  @Transform((params) => {
+    return params.value.split(',').map(Number);
+  })
+  memberIds: number[];
 }
 
 export class GetProjectsDto {

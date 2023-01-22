@@ -6,7 +6,13 @@ import { Role } from '../../enums';
 import { IPaginationResponse } from '../../interfaces';
 import { Project } from '../entities/projects.entity';
 import { User } from '../entities/users.entity';
-import { CreateProjectDto, GetProjectsDto, UpdateProjectDto } from './dto/projects.dto';
+import {
+  AddMembersDto,
+  CreateProjectDto,
+  GetProjectsDto,
+  RemoveMembersDto,
+  UpdateProjectDto,
+} from './dto/projects.dto';
 import { ProjectsService } from './projects.service';
 
 // import { CreateProjectDto, FilterProjectDto, ProjectProjectsDto } from './dto/projects.dto';
@@ -57,13 +63,13 @@ export class ProjectsController {
 
   @RoleDecorator(Role.ADMIN, Role.USER)
   @Patch('/members/:id')
-  addMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project[]> {
-    return this.projectsService.addMembers(ids, id);
+  addMembers(@Body() addMembersDto: AddMembersDto, @Param('id') id): Promise<string> {
+    return this.projectsService.addMembers(addMembersDto, id);
   }
 
   @RoleDecorator(Role.ADMIN, Role.USER)
   @Delete('/members/:id')
-  removeMembers(@Body('memberIds') ids, @Param('id') id): Promise<Project[]> {
-    return this.projectsService.removeMembers(ids, id);
+  removeMembers(@Body() removeMembersDto: RemoveMembersDto, @Param('id') id): Promise<string> {
+    return this.projectsService.removeMembers(removeMembersDto, id);
   }
 }
