@@ -4,7 +4,6 @@ import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey } from '../../utilities';
 import { Status } from '../entities/statuses.entity';
-import { User } from '../entities/users.entity';
 import { CreateStatusDto, UpdateStatusDto } from './dto/statuses.dto';
 import { StatusesRepository } from './statuses.repository';
 
@@ -14,12 +13,10 @@ export class StatusesService {
     @InjectRepository(StatusesRepository) private statusesRepository: StatusesRepository, // private usersService: UsersService,
   ) {}
 
-  async getStatuses(getStatusDto): Promise<IPaginationResponse<Status>> {
-    const { page, perPage } = getStatusDto;
-    return this.statusesRepository.paginationRepository(this.statusesRepository, {
-      page,
-      perPage,
-    });
+  async getStatuses(): Promise<Status[]> {
+    return this.statusesRepository.query(
+      'SELECT * FROM status order by status.order = 1 desc, status.order = 0 asc',
+    );
   }
 
   async getStatus(id): Promise<Status> {
@@ -33,7 +30,6 @@ export class StatusesService {
   async createStatus(createStatusDto: CreateStatusDto): Promise<any> {
     try {
       const { name, order, isShow } = createStatusDto;
-      console.log({ order });
       const status = this.statusesRepository.create({
         name,
         order,
@@ -66,19 +62,5 @@ export class StatusesService {
     await this.statusesRepository.save([status]);
 
     return status;
-  }
-
-  async getUserStatuses(id, getUserStatusesDto): Promise<IPaginationResponse<Status>> {
-    const queryBuilderRepo = await this.statusesRepository
-      .createQueryBuilder('t')
-      .leftJoinAndSelect('t.user', 'u')
-      .where('t.userId = :id', { id: id })
-      .select(['t', 'u.id', 'u.name']);
-
-    return await this.statusesRepository.paginationQueryBuilder(
-      queryBuilderRepo,
-      getUserStatusesDto,
-      true,
-    );
   }
 }

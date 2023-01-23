@@ -1,21 +1,19 @@
-import { IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
-import { IsDateGreaterThan } from '../../../common';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateTypeDto {
   @IsNotEmpty()
   name: string;
 
-  @IsOptional()
-  userId: string;
+  @IsNotEmpty()
+  color: string;
 
   @IsNotEmpty()
-  @IsDateString({}, { message: 'The start date should be date' })
-  startDate: string;
-
-  @IsNotEmpty()
-  @IsDateString({}, { message: 'The end date should be date' })
-  @IsDateGreaterThan('startDate', { message: 'The end date must be greater than the start date' })
-  endDate: string;
+  @IsBoolean()
+  @Transform(({ value }) => {
+    return value.toLowerCase() === 'true' || false;
+  })
+  isShow: boolean;
 }
 
 export class UpdateTypeDto {
@@ -23,16 +21,14 @@ export class UpdateTypeDto {
   name: string;
 
   @IsOptional()
-  userId: string;
+  color: string;
 
   @IsOptional()
-  @IsDateString({}, { message: 'The start date should be date' })
-  startDate: string;
-
-  @IsOptional()
-  @IsDateString({}, { message: 'The end date should be date' })
-  @IsDateGreaterThan('startDate', { message: 'The end date must be greater than the start date' })
-  endDate: string;
+  @IsBoolean()
+  @Transform(({ value }) => {
+    return value.toLowerCase() === 'true' || false;
+  })
+  isShow: boolean;
 }
 
 export class GetTypeDto {
@@ -42,7 +38,3 @@ export class GetTypeDto {
   @IsOptional()
   perPage: string;
 }
-
-// export class GetTypeDto {
-//   uuid: string;
-// }

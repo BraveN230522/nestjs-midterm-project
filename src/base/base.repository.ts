@@ -31,8 +31,13 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
     return instanceToPlain(await this.repo.save(entities)) as Array<Model>;
   }
 
-  async find(conditions, options?: FindManyOptions<Model>): Promise<Model[]> {
-    return instanceToPlain(await this.repo.find({ where: conditions, ...options })) as Model[];
+  async find(conditions?: any, options?: FindManyOptions<Model>): Promise<Model[]> {
+    return instanceToPlain(
+      await this.repo.find({
+        where: conditions as FindOptionsWhere<Model>[] | FindOptionsWhere<Model>,
+        ...options,
+      }),
+    ) as Model[];
   }
 
   async findRaw(conditions, options?: FindOneOptions<Model>): Promise<Model[]> {

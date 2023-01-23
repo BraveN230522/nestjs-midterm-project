@@ -5,7 +5,7 @@ import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey } from '../../utilities';
 import { Priority } from '../entities/priorities.entity';
 import { User } from '../entities/users.entity';
-import { CreatePriorityDto } from './dto/priorities.dto';
+import { CreatePriorityDto, UpdatePriorityDto } from './dto/priorities.dto';
 import { PrioritiesRepository } from './priorities.repository';
 
 @Injectable()
@@ -14,12 +14,8 @@ export class PrioritiesService {
     @InjectRepository(PrioritiesRepository) private prioritiesRepository: PrioritiesRepository, // private usersService: UsersService,
   ) {}
 
-  async getPriorities(getPriorityDto): Promise<IPaginationResponse<Priority>> {
-    const { page, perPage } = getPriorityDto;
-    return this.prioritiesRepository.paginationRepository(this.prioritiesRepository, {
-      page,
-      perPage,
-    });
+  async getPriorities(): Promise<Priority[]> {
+    return this.prioritiesRepository.find();
   }
 
   async getPriority(id): Promise<Priority> {
@@ -30,25 +26,27 @@ export class PrioritiesService {
     return found;
   }
 
-  async createPriority(createPriorityDto: CreatePriorityDto, currentUser: User): Promise<any> {
-    // try {
-    //   const { name, userId, startDate, endDate } = createPriorityDto;
-    //   const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
-    //   const user = await this.usersService.getUser(userId);
-    //   const priority = this.prioritiesRepository.create({
-    //     name,
-    //     startDate: formattedStartDate,
-    //     endDate: formattedEndDate,
-    //     user: user || currentUser,
-    //   });
-    //   await this.prioritiesRepository.save([priority]);
-    //   const mappingPriority = _.omit(priority, ['user']) as Priority;
-    //   return mappingPriority;
-    // } catch (error) {
-    //   console.log({ error });
-    //   if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
-    //   else ErrorHelper.InternalServerErrorException();
-    // }
+  async createPriority(createPriorityDto: CreatePriorityDto): Promise<any> {
+    try {
+      const { name, order, isShow } = createPriorityDto;
+      const priority = this.prioritiesRepository.create({
+        name,
+        order,
+        isShow,
+      });
+      await this.prioritiesRepository.save([priority]);
+      return priority;
+    } catch (error) {
+      if (error.code === '23505') {
+        const detail = error.detail as string;
+        const uniqueArr = ['name', 'order'];
+
+        uniqueArr.forEach((item) => {
+          if (detail.indexOf(item) !== -1)
+            ErrorHelper.ConflictException(`This ${item} already exists`);
+        });
+      } else ErrorHelper.InternalServerErrorException();
+    }
   }
 
   async deletePriority(id): Promise<void> {
@@ -56,7 +54,7 @@ export class PrioritiesService {
     if (result.affected === 0) ErrorHelper.NotFoundException(`Priority ${id} is not found`);
   }
 
-  async updatePriority(id, updatePriorityDto): Promise<Priority> {
+  async updatePriority(id, updatePriorityDto: UpdatePriorityDto): Promise<Priority> {
     const priority = await this.getPriority(id);
     assignIfHasKey(priority, updatePriorityDto);
 

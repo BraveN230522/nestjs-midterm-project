@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/co
 import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
-import { Type } from '../entities/types.entity';
+import { Type } from '../entities/Types.entity';
 import { User } from '../entities/users.entity';
 import { CreateTypeDto, GetTypeDto, UpdateTypeDto } from './dto/types.dto';
 import { TypesService } from './types.service';
@@ -13,14 +13,14 @@ export class TypesController {
   constructor(private TypesService: TypesService) {}
 
   @Get()
-  getTypes(@Body() getTypeDto: GetTypeDto) {
-    return this.TypesService.getTypes(getTypeDto);
+  getTypes(): Promise<Type[]> {
+    return this.TypesService.getTypes();
   }
 
   @Post()
   @RoleDecorator(Role.USER)
-  createType(@Body() createTypeDto: CreateTypeDto, @UserDecorator() user: User): Promise<Type> {
-    return this.TypesService.createType(createTypeDto, user);
+  createType(@Body() createTypeDto: CreateTypeDto): Promise<Type> {
+    return this.TypesService.createType(createTypeDto);
   }
 
   @Patch('/:id')

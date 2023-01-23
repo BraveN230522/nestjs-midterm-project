@@ -1,10 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
+import { RoleDecorator, RolesGuard } from '../../common';
 import { Role } from '../../enums';
 import { Status } from '../entities/Statuses.entity';
-import { User } from '../entities/users.entity';
-import { CreateStatusDto, GetStatusDto, UpdateStatusDto } from './dto/statuses.dto';
+import { CreateStatusDto, UpdateStatusDto } from './dto/statuses.dto';
 import { StatusesService } from './statuses.service';
 
 @Controller('Statuses')
@@ -13,8 +12,8 @@ export class StatusesController {
   constructor(private StatusesService: StatusesService) {}
 
   @Get()
-  getStatuses(@Body() getStatusDto: GetStatusDto) {
-    return this.StatusesService.getStatuses(getStatusDto);
+  getStatuses(): Promise<Status[]> {
+    return this.StatusesService.getStatuses();
   }
 
   @Post()

@@ -13,17 +13,14 @@ export class PrioritiesController {
   constructor(private PrioritiesService: PrioritiesService) {}
 
   @Get()
-  getPriorities(@Body() getPriorityDto: GetPriorityDto) {
-    return this.PrioritiesService.getPriorities(getPriorityDto);
+  getPriorities(): Promise<Priority[]> {
+    return this.PrioritiesService.getPriorities();
   }
 
   @Post()
   @RoleDecorator(Role.USER)
-  createPriority(
-    @Body() createPriorityDto: CreatePriorityDto,
-    @UserDecorator() user: User,
-  ): Promise<Priority> {
-    return this.PrioritiesService.createPriority(createPriorityDto, user);
+  createPriority(@Body() createPriorityDto: CreatePriorityDto): Promise<Priority> {
+    return this.PrioritiesService.createPriority(createPriorityDto);
   }
 
   @Patch('/:id')
