@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsDateString, IsInt, IsNotEmpty, IsOptional, MinDate, ValidateIf } from 'class-validator';
+import { IsDateString, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
 import { IsDateGreaterThan } from '../../../common';
 
 export class CreateProjectDto {

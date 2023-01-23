@@ -9,10 +9,16 @@ export class Type extends BaseTable {
     Object.assign(this, partial);
   }
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   name: string;
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   color: string;
 
   @Column({ type: 'bool' })

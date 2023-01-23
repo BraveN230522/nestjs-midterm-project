@@ -19,11 +19,8 @@ export class StatusesController {
 
   @Post()
   @RoleDecorator(Role.USER)
-  createStatus(
-    @Body() createStatusDto: CreateStatusDto,
-    @UserDecorator() user: User,
-  ): Promise<Status> {
-    return this.StatusesService.createStatus(createStatusDto, user);
+  createStatus(@Body() createStatusDto: CreateStatusDto): Promise<Status> {
+    return this.StatusesService.createStatus(createStatusDto);
   }
 
   @Patch('/:id')

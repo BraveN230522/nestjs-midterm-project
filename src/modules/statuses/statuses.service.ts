@@ -5,7 +5,7 @@ import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey } from '../../utilities';
 import { Status } from '../entities/statuses.entity';
 import { User } from '../entities/users.entity';
-import { CreateStatusDto } from './dto/statuses.dto';
+import { CreateStatusDto, UpdateStatusDto } from './dto/statuses.dto';
 import { StatusesRepository } from './statuses.repository';
 
 @Injectable()
@@ -30,25 +30,28 @@ export class StatusesService {
     return found;
   }
 
-  async createStatus(createStatusDto: CreateStatusDto, currentUser: User): Promise<any> {
-    // try {
-    //   const { name, userId, startDate, endDate } = createStatusDto;
-    //   const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
-    //   const user = await this.usersService.getUser(userId);
-    //   const status = this.statusesRepository.create({
-    //     name,
-    //     startDate: formattedStartDate,
-    //     endDate: formattedEndDate,
-    //     user: user || currentUser,
-    //   });
-    //   await this.statusesRepository.save([status]);
-    //   const mappingStatus = _.omit(status, ['user']) as Status;
-    //   return mappingStatus;
-    // } catch (error) {
-    //   console.log({ error });
-    //   if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
-    //   else ErrorHelper.InternalServerErrorException();
-    // }
+  async createStatus(createStatusDto: CreateStatusDto): Promise<any> {
+    try {
+      const { name, order, isShow } = createStatusDto;
+      console.log({ order });
+      const status = this.statusesRepository.create({
+        name,
+        order,
+        isShow,
+      });
+      await this.statusesRepository.save([status]);
+      return status;
+    } catch (error) {
+      if (error.code === '23505') {
+        const detail = error.detail as string;
+        const uniqueArr = ['name', 'order'];
+
+        uniqueArr.forEach((item) => {
+          if (detail.indexOf(item) !== -1)
+            ErrorHelper.ConflictException(`This ${item} already exists`);
+        });
+      } else ErrorHelper.InternalServerErrorException();
+    }
   }
 
   async deleteStatus(id): Promise<void> {
@@ -56,7 +59,7 @@ export class StatusesService {
     if (result.affected === 0) ErrorHelper.NotFoundException(`Status ${id} is not found`);
   }
 
-  async updateStatus(id, updateStatusDto): Promise<Status> {
+  async updateStatus(id, updateStatusDto: UpdateStatusDto): Promise<Status> {
     const status = await this.getStatus(id);
     assignIfHasKey(status, updateStatusDto);
 

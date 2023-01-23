@@ -9,10 +9,16 @@ export class Priority extends BaseTable {
     Object.assign(this, partial);
   }
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   name: string;
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   order: number;
 
   @Column({ type: 'bool' })
