@@ -17,11 +17,6 @@ export class TasksController {
     return this.tasksService.getTasks(getTaskDto);
   }
 
-  // @Get('/:id')
-  // getTask(@Param('id') id): Promise<Task> {
-  //   return this.tasksService.getTask(id);
-  // }
-
   @Post()
   @RoleDecorator(Role.USER)
   createTask(@Body() createTaskDto: CreateTaskDto, @UserDecorator() user: User): Promise<Task> {
@@ -29,7 +24,6 @@ export class TasksController {
   }
 
   @Patch('/:id')
-  // @RoleDecorator(Role.ADMIN)
   updateProject(@Param('id') id, @Body() updateTaskDto: UpdateTaskDto): Promise<Task> {
     return this.tasksService.updateTask(id, updateTaskDto);
   }

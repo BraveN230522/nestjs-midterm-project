@@ -20,7 +20,6 @@ import { TasksRepository } from './tasks.repository';
 
 @Injectable()
 export class TasksService {
-  authRepository: any;
   constructor(
     @InjectRepository(TasksRepository) private tasksRepository: TasksRepository, // private usersService: UsersService,
     @Inject(forwardRef(() => UsersService))
