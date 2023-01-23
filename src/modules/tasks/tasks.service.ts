@@ -1,6 +1,5 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
 import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
@@ -12,7 +11,7 @@ import { ProjectsService } from '../projects/projects.service';
 import { StatusesService } from '../statuses/statuses.service';
 import { UsersService } from '../users/users.service';
 import { TypesService } from './../types/types.service';
-import { CreateTaskDto } from './dto/tasks.dto';
+import { CreateTaskDto, UpdateTaskDto } from './dto/tasks.dto';
 import { TasksRepository } from './tasks.repository';
 
 @Injectable()
@@ -80,8 +79,7 @@ export class TasksService {
 
       return res?.[0];
     } catch (error) {
-      if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
-      else ErrorHelper.InternalServerErrorException();
+      ErrorHelper.InternalServerErrorException();
     }
   }
 
@@ -90,9 +88,17 @@ export class TasksService {
     if (result.affected === 0) ErrorHelper.NotFoundException(`Task ${id} is not found`);
   }
 
-  async updateTask(id, updateTaskDto): Promise<Task> {
+  async updateTask(id, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    const { userId, typeId, priorityId, statusId, projectId } = updateTaskDto;
+
     const task = await this.getTask(id);
-    assignIfHasKey(task, updateTaskDto);
+    const type = await this.typesService.getType(typeId);
+    const priority = await this.prioritiesService.getPriority(priorityId);
+    const status = await this.statusesService.getStatus(statusId);
+    const project = await this.projectsService.getProject(projectId);
+    const user = await this.usersService.getUser(userId);
+
+    assignIfHasKey(task, { ...updateTaskDto, type, priority, status, project, user });
 
     await this.tasksRepository.save([task]);
 

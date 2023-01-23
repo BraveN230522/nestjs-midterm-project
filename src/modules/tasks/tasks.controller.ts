@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleDecorator, RolesGuard, UserDecorator } from '../../common';
 import { Role } from '../../enums';
@@ -33,16 +33,8 @@ export class TasksController {
     return this.tasksService.updateTask(id, updateTaskDto);
   }
 
-  // @Delete('/:id')
-  // deleteTask(@Param('id') id): Promise<void> {
-  //   return this.tasksService.deleteTask(id);
-  // }
-
-  // @Patch('/:id')
-  // updateTask(
-  //   @Param('id') id,
-  //   @Body() updateTaskDto: CreateTaskDto,
-  // ): Promise<Task> {
-  //   return this.tasksService.updateTask(id, updateTaskDto);
-  // }
+  @Delete('/:id')
+  deleteTask(@Param('id') id): Promise<void> {
+    return this.tasksService.deleteTask(id);
+  }
 }

@@ -38,6 +38,18 @@ export class UpdateTaskDto {
   userId: string;
 
   @IsOptional()
+  typeId: string;
+
+  @IsOptional()
+  priorityId: string;
+
+  @IsOptional()
+  statusId: string;
+
+  @IsOptional()
+  projectId: string;
+
+  @IsOptional()
   @IsDateString({}, { message: 'The start date should be date' })
   startDate: string;
 
