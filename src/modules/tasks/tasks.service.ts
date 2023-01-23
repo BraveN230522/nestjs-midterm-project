@@ -73,12 +73,12 @@ export class TasksService {
   }
 
   async updateTask(id, updateTaskDto): Promise<Task> {
-    const user = await this.getTask(id);
-    assignIfHasKey(user, updateTaskDto);
+    const task = await this.getTask(id);
+    assignIfHasKey(task, updateTaskDto);
 
-    await this.tasksRepository.save([user]);
+    await this.tasksRepository.save([task]);
 
-    return user;
+    return task;
   }
 
   async getUserTasks(id, getUserTasksDto): Promise<IPaginationResponse<Task>> {

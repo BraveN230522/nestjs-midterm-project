@@ -42,7 +42,7 @@ export class ProjectsController {
   }
 
   @Patch('/:id')
-  @RoleDecorator(Role.ADMIN)
+  // @RoleDecorator(Role.ADMIN)
   updateProject(@Param('id') id, @Body() updateProjectDto: UpdateProjectDto): Promise<Project> {
     return this.projectsService.updateProject(id, updateProjectDto);
   }

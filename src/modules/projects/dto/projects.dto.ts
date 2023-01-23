@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsDateString, IsInt, IsNotEmpty, IsOptional, MinDate, ValidateIf } from 'class-validator';
-import moment from 'moment';
+import { IsDateGreaterThan } from '../../../common';
 
 export class CreateProjectDto {
   @IsNotEmpty()
@@ -10,19 +10,12 @@ export class CreateProjectDto {
   slug: string;
 
   @IsNotEmpty()
-  // @IsDateString({}, { message: 'The start date from should be date' })
-  @ValidateIf((obj) => {
-    const endDate = moment(obj.endDate, 'YYYY-MM-DD').toISOString();
-    const startDate = moment(obj.startDate, 'YYYY-MM-DD').toISOString();
-    const diffTime = moment(startDate).diff(endDate);
-
-    console.log({ diffTime });
-    return diffTime ? diffTime <= 0 : true;
-  })
+  @IsDateString({}, { message: 'The start date should be date' })
   startDate: string;
 
   @IsNotEmpty()
-  // @IsDateString({}, { message: 'The end date from should be date' })
+  @IsDateString({}, { message: 'The end date should be date' })
+  @IsDateGreaterThan('startDate', { message: 'The end date must be greater than the start date' })
   endDate: string;
 }
 
@@ -34,19 +27,12 @@ export class UpdateProjectDto {
   slug: string;
 
   @IsOptional()
-  // @IsDateString({}, { message: 'The start date from should be date' })
-  @ValidateIf((obj) => {
-    const endDate = moment(obj.endDate, 'YYYY-MM-DD').toISOString();
-    const startDate = moment(obj.startDate, 'YYYY-MM-DD').toISOString();
-    const diffTime = moment(startDate).diff(endDate);
-
-    console.log({ diffTime });
-    return diffTime ? diffTime <= 0 : true;
-  })
+  @IsDateString({}, { message: 'The start date should be date' })
   startDate: string;
 
   @IsOptional()
-  // @IsDateString({}, { message: 'The end date from should be date' })
+  @IsDateString({}, { message: 'The end date should be date' })
+  @IsDateGreaterThan('startDate', { message: 'The end date must be greater than the start date' })
   endDate: string;
 }
 
