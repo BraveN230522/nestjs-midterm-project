@@ -129,11 +129,11 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
     pageOptions: IPageOption,
     isRaw?: boolean,
   ): Promise<IPaginationResponse<Model>> {
-    const { perPage, page } = numberInputs(pageOptions);
+    const { perPage = 10, page = 1 } = numberInputs(pageOptions);
     const total = await queryBuilder.getCount();
     const result = await queryBuilder
       .skip(perPage * (page - 1))
-      .take(perPage)
+      .take(perPage || 10)
       .getMany();
 
     return {
