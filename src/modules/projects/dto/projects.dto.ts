@@ -56,24 +56,24 @@ export class RemoveMembersDto {
 
 export class GetProjectsDto {
   @IsOptional()
-  page: string;
+  page: number;
 
   @IsOptional()
-  perPage: string;
+  perPage: number;
 }
 
 export class GetProjectMembersDto {
   @IsOptional()
-  page: string;
+  page: number;
 
   @IsOptional()
-  perPage: string;
+  perPage: number;
 }
 
-export class UserTasksDto {
+export class GetProjectTasksDto {
   @IsOptional()
-  page: string;
+  page: number;
 
   @IsOptional()
-  perPage: string;
+  perPage: number;
 }

@@ -7,10 +7,12 @@ import { IPaginationResponse } from '../../interfaces';
 import { APP_MESSAGE } from '../../messages';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
 import { Project } from '../entities/projects.entity';
+import { Task } from '../entities/tasks.entity';
 import { User } from '../entities/users.entity';
+import { TasksRepository } from '../tasks/tasks.repository';
 import { UsersRepository } from '../users/users.repository';
 import { ErrorHelper } from './../../helpers/error.helper';
-import { CreateProjectDto } from './dto/projects.dto';
+import { CreateProjectDto, GetProjectTasksDto } from './dto/projects.dto';
 import { ProjectsRepository } from './projects.repository';
 
 @Injectable()
@@ -18,6 +20,7 @@ export class ProjectsService {
   constructor(
     @InjectRepository(ProjectsRepository) private projectsRepository: ProjectsRepository, // @Inject(forwardRef(() => TasksService)) // private readonly tasksService: TasksService,
     private usersRepository: UsersRepository,
+    private tasksRepository: TasksRepository,
   ) {}
 
   async createProject(createProjectDto: CreateProjectDto): Promise<Project> {
@@ -97,7 +100,7 @@ export class ProjectsService {
       users: [...(membersOfProject.items as User[]), ...memberShouldBeAdded],
     });
 
-    return APP_MESSAGE.ADDED_MEMBER;
+    return APP_MESSAGE.ADDED_SUCCESSFULLY('members');
   }
 
   async removeMembers(removeMembersDto, id): Promise<string> {
@@ -109,7 +112,7 @@ export class ProjectsService {
     const memberAfterRemoving = _.differenceBy(membersOfProject.items as User[], users, 'id');
     assignIfHasKey(project, { users: memberAfterRemoving });
 
-    return APP_MESSAGE.REMOVED_MEMBER;
+    return APP_MESSAGE.REMOVED_SUCCESSFULLY('members');
   }
 
   async deleteProject(id) {
@@ -121,7 +124,7 @@ export class ProjectsService {
 
     if (result.affected === 0) ErrorHelper.NotFoundException(`Project ${id} is not found`);
 
-    return APP_MESSAGE.DELETED_PROJECT;
+    return APP_MESSAGE.DELETED_SUCCESSFULLY('project');
   }
 
   async getUserProjects(id, getUserProjectsDto): Promise<IPaginationResponse<Project>> {
@@ -134,6 +137,23 @@ export class ProjectsService {
     return await this.projectsRepository.paginationQueryBuilder(
       queryBuilderRepo,
       getUserProjectsDto,
+      true,
+    );
+  }
+
+  async getTaskProjects(
+    id,
+    getProjectTasksDto: GetProjectTasksDto,
+  ): Promise<IPaginationResponse<Task>> {
+    console.log({ getProjectTasksDto });
+    const queryBuilderRepo = await this.tasksRepository
+      .createQueryBuilder('t')
+      .leftJoin('t.project', 'p')
+      .where('p.id = :projectId', { projectId: id });
+
+    return await this.tasksRepository.paginationQueryBuilder(
+      queryBuilderRepo,
+      getProjectTasksDto,
       true,
     );
   }

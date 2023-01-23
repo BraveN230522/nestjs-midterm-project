@@ -73,4 +73,13 @@ export class ProjectsController {
   removeMembers(@Body() removeMembersDto: RemoveMembersDto, @Param('id') id): Promise<string> {
     return this.projectsService.removeMembers(removeMembersDto, id);
   }
+
+  @RoleDecorator(Role.ADMIN, Role.USER)
+  @Get('/tasks/:id')
+  getTaskProjects(
+    @Param('id') id,
+    @Body() getTaskProjectsDto: GetProjectMembersDto,
+  ): Promise<IPaginationResponse<User>> {
+    return this.projectsService.getTaskProjects(id, getTaskProjectsDto);
+  }
 }
