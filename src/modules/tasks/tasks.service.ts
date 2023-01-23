@@ -1,20 +1,17 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  forwardRef,
-} from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
-import { FindOneOptions } from 'typeorm';
 import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
 import { Task } from '../entities/tasks.entity';
 import { User } from '../entities/users.entity';
+import { PrioritiesService } from '../priorities/priorities.service';
+import { ProjectsService } from '../projects/projects.service';
+import { StatusesService } from '../statuses/statuses.service';
 import { UsersService } from '../users/users.service';
+import { TypesService } from './../types/types.service';
 import { CreateTaskDto } from './dto/tasks.dto';
 import { TasksRepository } from './tasks.repository';
 
@@ -24,6 +21,10 @@ export class TasksService {
     @InjectRepository(TasksRepository) private tasksRepository: TasksRepository, // private usersService: UsersService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    private readonly typesService: TypesService,
+    private readonly prioritiesService: PrioritiesService,
+    private readonly statusesService: StatusesService,
+    private readonly projectsService: ProjectsService,
   ) {}
 
   async getTasks(getTaskDto): Promise<IPaginationResponse<Task>> {
@@ -35,32 +36,50 @@ export class TasksService {
   }
 
   async getTask(id): Promise<Task> {
-    const found = await this.tasksRepository.findOneBy({ id });
-
+    const found = await this.tasksRepository.findOneRaw(
+      { id: id },
+      { relations: ['user', 'project', 'status', 'priority', 'type'] },
+    );
     if (!found) ErrorHelper.NotFoundException(`Task ${id} is not found`);
 
-    return found;
+    const mappingTask = {
+      ...found,
+      user: _.pick(found.user, ['id', 'name']),
+      project: _.pick(found.project, ['id', 'name']),
+      status: _.pick(found.status, ['id', 'name']),
+      priority: _.pick(found.priority, ['id', 'name']),
+      type: _.pick(found.type, ['id', 'name']),
+    };
+
+    return mappingTask as Task;
   }
 
   async createTask(createTaskDto: CreateTaskDto, currentUser: User): Promise<Task> {
+    const { name, userId, typeId, priorityId, statusId, projectId, startDate, endDate } =
+      createTaskDto;
+
+    const type = await this.typesService.getType(typeId);
+    const priority = await this.prioritiesService.getPriority(priorityId);
+    const status = await this.statusesService.getStatus(statusId);
+    const project = await this.projectsService.getProject(projectId);
+    const user = await this.usersService.getUser(userId);
     try {
-      const { name, userId, startDate, endDate } = createTaskDto;
       const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
-      const user = await this.usersService.getUser(userId);
       const task = this.tasksRepository.create({
         name,
         startDate: formattedStartDate,
         endDate: formattedEndDate,
         user: user || currentUser,
+        type,
+        priority,
+        status,
+        project,
       });
 
-      await this.tasksRepository.save([task]);
+      const res = await this.tasksRepository.save([task]);
 
-      const mappingTask = _.omit(task, ['user']) as Task;
-
-      return mappingTask;
+      return res?.[0];
     } catch (error) {
-      console.log({ error });
       if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
       else ErrorHelper.InternalServerErrorException();
     }

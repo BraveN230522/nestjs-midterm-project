@@ -52,8 +52,8 @@ export class BaseRepository<Model extends BaseTable> extends Repository<Model> {
     return await this.repo.findOneBy(opts);
   }
 
-  async findOne(options: FindOneOptions<Model>): Promise<Model> {
-    return (await instanceToPlain(this.repo.findOne(options))) as Model;
+  async findOne(conditions, options?: FindOneOptions<Model>): Promise<Model> {
+    return (await instanceToPlain(this.repo.findOne({ where: conditions, ...options }))) as Model;
   }
 
   async findOneRaw(conditions, options?: FindOneOptions<Model>): Promise<Model> {

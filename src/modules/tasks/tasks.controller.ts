@@ -17,6 +17,11 @@ export class TasksController {
     return this.tasksService.getTasks(getTaskDto);
   }
 
+  @Get('/:id')
+  getTask(@Param('id') id) {
+    return this.tasksService.getTask(id);
+  }
+
   @Post()
   @RoleDecorator(Role.USER)
   createTask(@Body() createTaskDto: CreateTaskDto, @UserDecorator() user: User): Promise<Task> {

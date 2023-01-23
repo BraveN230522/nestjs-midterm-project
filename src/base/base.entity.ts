@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { IsDate, IsNumber } from 'class-validator';
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
@@ -7,6 +8,7 @@ export abstract class BaseTable {
   @IsNumber()
   public id: number;
 
+  @Exclude({ toPlainOnly: true })
   @Column({
     type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',
@@ -15,6 +17,7 @@ export abstract class BaseTable {
   @IsDate()
   public createdAt: Date;
 
+  @Exclude({ toPlainOnly: true })
   @Column({
     type: 'timestamp with time zone',
     default: () => 'CURRENT_TIMESTAMP',

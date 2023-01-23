@@ -27,15 +27,19 @@ export class Task extends BaseTable {
   @ManyToOne(() => User, (user) => user.tasks, { onDelete: 'CASCADE' })
   user: User;
 
+  @Exclude({ toPlainOnly: true })
   @ManyToOne(() => Project, (project) => project.tasks, { onDelete: 'CASCADE' })
   project: Project;
 
+  @Exclude({ toPlainOnly: true })
   @ManyToOne(() => Status, (status) => status.tasks, { onDelete: 'CASCADE' })
   status: Status;
 
+  @Exclude({ toPlainOnly: true })
   @ManyToOne(() => Priority, (priority) => priority.tasks, { onDelete: 'CASCADE' })
   priority: Priority;
 
+  @Exclude({ toPlainOnly: true })
   @ManyToOne(() => Type, (type) => type.tasks, { onDelete: 'CASCADE' })
   type: Type;
 }

@@ -5,8 +5,20 @@ export class CreateTaskDto {
   @IsNotEmpty()
   name: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   userId: string;
+
+  @IsNotEmpty()
+  typeId: string;
+
+  @IsNotEmpty()
+  priorityId: string;
+
+  @IsNotEmpty()
+  statusId: string;
+
+  @IsNotEmpty()
+  projectId: string;
 
   @IsNotEmpty()
   @IsDateString({}, { message: 'The start date should be date' })
