@@ -51,8 +51,9 @@ export class User extends BaseTable {
 
   @Column({
     nullable: false,
-    type: 'bool',
-    default: !!UserStatus.Inactive,
+    type: 'enum',
+    enum: UserStatus,
+    default: UserStatus.Inactive,
   })
   status: UserStatus;
 

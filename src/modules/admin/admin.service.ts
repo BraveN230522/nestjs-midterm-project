@@ -29,20 +29,12 @@ export class AdminService {
       const salt = bcrypt.genSaltSync(1);
       const hashedPassword = bcrypt.hashSync(password, salt);
 
-      // const auth = this.authRepository.create({
-      //   username,
-      //   password: hashedPassword,
-      // });
-
       const user = this.adminRepository.create({
         username,
         password: hashedPassword,
         // auth: auth,
       });
 
-      // console.log({ user, auth });
-
-      // await this.authRepository.save(auth);
       await this.adminRepository.save([user]);
 
       return user;

@@ -33,3 +33,10 @@ export const genPagination = (page: number, perPage: number, arrayLength: number
     totalItems: arrayLength,
   };
 };
+
+export const checkNotExists = (reqData, data) => {
+  return _.difference(
+    reqData,
+    _.map(data, (p) => p.id),
+  );
+};

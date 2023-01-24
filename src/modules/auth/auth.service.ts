@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import _ from 'lodash';
-import { Role } from '../../enums';
+import { Role, UserStatus } from '../../enums';
 import { EncryptHelper, ErrorHelper } from '../../helpers';
 import { APP_MESSAGE } from '../../messages';
 import { assignIfHasKey, matchWord } from '../../utilities';
@@ -23,13 +23,6 @@ export class AuthService {
   ) {}
 
   async loginAdmin({ username, password }): Promise<Admin> {
-    // bcrypt.genSalt(1, function (err, salt) {
-    //   bcrypt.hash('123', salt, function (err, hash) {
-    //     console.log({ hash });
-    //     // Store hash in your password DB.
-    //   });
-    // });
-    // return;
     const found = await this.adminService.getAdminByUsername({ username });
 
     const match =
@@ -53,19 +46,13 @@ export class AuthService {
   }
 
   async loginUser({ username, password }): Promise<User> {
-    // bcrypt.genSalt(1, function (err, salt) {
-    //   bcrypt.hash('123', salt, function (err, hash) {
-    //     console.log({ hash });
-    //     // Store hash in your password DB.
-    //   });
-    // });
-    // return;
     const found = await this.userService.getUserByUsername({ username });
     console.log({ found });
     const match =
       (await bcrypt.compare(password || '', found?.password || '')) && username === found?.username;
 
     if (!match) ErrorHelper.UnauthorizedException(`Username or password is incorrect`);
+    if (!found.status) ErrorHelper.UnauthorizedException(`This user is inactive`);
 
     const payload = { username, role: found.role };
     const accessToken = await this.jwtService.sign(payload);

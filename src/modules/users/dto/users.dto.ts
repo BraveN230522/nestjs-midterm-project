@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -14,14 +13,18 @@ import { UserStatus } from '../../../enums';
 export class CreateUserDto {
   @IsNotEmpty()
   @IsInt({ each: true })
-  @Transform((params) => params.value.split(',').map(Number))
+  @Transform((params) => {
+    if (params.value !== '') return params.value.split(',').map(Number);
+  })
   defaultProjects: number[];
 }
 
 export class UpdateUserDto {
   @IsOptional()
   @IsInt({ each: true })
-  @Transform((params) => params.value.split(',').map(Number))
+  @Transform((params) => {
+    if (params.value !== '') return params.value.split(',').map(Number);
+  })
   defaultProjects: number[];
 
   @IsOptional()

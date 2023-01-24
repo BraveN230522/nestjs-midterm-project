@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { REGEX_PATTERN } from '../../constants';
 import { EncryptHelper, ErrorHelper } from '../../helpers';
 import { APP_MESSAGE } from '../../messages';
-import { assignIfHasKey, matchWord } from '../../utilities';
+import { assignIfHasKey, checkNotExists, matchWord } from '../../utilities';
 import { User } from '../entities/users.entity';
 import { ProjectsRepository } from '../projects/projects.repository';
 import { UsersRepository } from './users.repository';
@@ -44,18 +44,19 @@ export class UsersService {
   }
 
   async createUser(createUserDto): Promise<any> {
-    try {
-      const { defaultProjects } = createUserDto;
-      const projects = await this.projectsRepository.findByIds(defaultProjects);
+    const { defaultProjects } = createUserDto;
+    const projects = await this.projectsRepository.findByIds(defaultProjects);
 
+    const notExistsProjects = checkNotExists(defaultProjects, projects);
+    if (notExistsProjects.length > 0)
+      ErrorHelper.ConflictException(`Projects ${notExistsProjects} not exist`);
+
+    try {
       const user = this.usersRepository.create({
         projects: projects,
       });
-
       await this.usersRepository.save([user]);
-
       const mappingUser = _.omit(user, ['projects']);
-
       return mappingUser;
     } catch (error) {
       ErrorHelper.InternalServerErrorException();
