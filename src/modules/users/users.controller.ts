@@ -13,6 +13,7 @@ import {
   GetUserDto,
   GetUserProjectsDto,
   GetUserTasksDto,
+  RegisterUserDto,
   UpdateUserDto,
 } from './dto/users.dto';
 import { UsersService } from './users.service';
@@ -20,7 +21,6 @@ import { UsersService } from './users.service';
 @Controller('users')
 // @UseGuards(AuthGuard())
 @UseGuards(AuthGuard(), RolesGuard)
-@RoleDecorator(Role.SUPER_ADMIN)
 export class UsersController {
   constructor(
     private usersService: UsersService,
@@ -60,8 +60,14 @@ export class UsersController {
 
   @Patch('/:id')
   @RoleDecorator(Role.ADMIN)
-  updateUser(@Param('id') id, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+  updateUser(@Param('id') id, @Body() updateUserDto: UpdateUserDto): Promise<string> {
     return this.usersService.updateUser(id, updateUserDto);
+  }
+
+  @Patch('/register/:uuid')
+  // @RoleDecorator(Role.ADMIN)
+  registerUser(@Param('uuid') uuid, @Body() registerUserDto: RegisterUserDto): Promise<string> {
+    return this.usersService.register(uuid, registerUserDto);
   }
 
   @Get('/tasks/:id')

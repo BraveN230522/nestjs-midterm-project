@@ -1,6 +1,8 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import _ from 'lodash';
+import moment from 'moment';
+import { Role } from '../../enums';
 import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
 import { assignIfHasKey, datesToISOString } from '../../utilities';
@@ -26,8 +28,8 @@ export class TasksService {
     private readonly projectsService: ProjectsService,
   ) {}
 
-  async getTasks(getTaskDto): Promise<IPaginationResponse<Task>> {
-    const queryBuilderRepo = await this.tasksRepository
+  async getTasks(getTaskDto, currentUser: User): Promise<IPaginationResponse<Task>> {
+    let queryBuilderRepo = await this.tasksRepository
       .createQueryBuilder('t')
       .leftJoin('t.status', 's')
       .leftJoin('t.priority', 'p')
@@ -45,6 +47,29 @@ export class TasksService {
         'p.name',
         'p.order',
       ]);
+
+    if (currentUser.role === Role.USER) {
+      queryBuilderRepo = await this.tasksRepository
+        .createQueryBuilder('t')
+        .leftJoin('t.status', 's')
+        .leftJoin('t.priority', 'p')
+        .leftJoin('t.user', 'u')
+        .orderBy('s.order', 'DESC')
+        // .orderBy('p.order', 'ASC')
+        .where('u.id = :userId', { userId: currentUser.id })
+        .select([
+          't.id',
+          't.name',
+          't.startDate',
+          't.endDate',
+          's.id',
+          's.name',
+          's.order',
+          'p.id',
+          'p.name',
+          'p.order',
+        ]);
+    }
 
     return this.tasksRepository.paginationQueryBuilder(queryBuilderRepo, getTaskDto, true);
   }
@@ -68,6 +93,19 @@ export class TasksService {
     return mappingTask as Task;
   }
 
+  validateTaskDate(taskDates, projectDates) {
+    const startDateTask = moment(taskDates.endDate);
+    const startDateProject = moment(projectDates.endDate);
+    const endDateTask = moment(taskDates.startDate);
+    const endDateProject = moment(projectDates.startDate);
+
+    const diffTimeStartDate = moment(startDateTask).diff(startDateProject);
+    const diffTimeEndDate = moment(endDateTask).diff(endDateProject);
+
+    if (diffTimeStartDate > 0 || diffTimeEndDate < 0)
+      ErrorHelper.BadRequestException('Date of task need to be in range of project');
+  }
+
   async createTask(createTaskDto: CreateTaskDto, currentUser: User): Promise<Task> {
     const { name, userId, typeId, priorityId, statusId, projectId, startDate, endDate } =
       createTaskDto;
@@ -77,8 +115,20 @@ export class TasksService {
     const status = await this.statusesService.getStatus(statusId);
     const project = await this.projectsService.getProject(projectId);
     const user = await this.usersService.getUser(userId);
+    const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
+
+    this.validateTaskDate(
+      {
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+      },
+      {
+        startDate: project.startDate,
+        endDate: project.endDate,
+      },
+    );
+
     try {
-      const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
       const task = this.tasksRepository.create({
         name,
         startDate: formattedStartDate,

@@ -1,12 +1,11 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
   IsEnum,
   IsInt,
   IsNotEmpty,
-  IsNumberString,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -17,29 +16,8 @@ export class CreateUserDto {
   @IsInt({ each: true })
   @Transform((params) => params.value.split(',').map(Number))
   defaultProjects: number[];
-
-  // @IsNotEmpty()
-  // name: string;
-
-  // @IsNotEmpty()
-  // username: string;
-
-  // @IsNotEmpty()
-  // @IsString()
-  // @MinLength(3)
-  // @MaxLength(32)
-  // password: string;
-
-  // @IsNotEmpty()
-  // @IsEnum(UserStatus)
-  // @Transform(({ value }) => Number.parseInt(value))
-  // @Type(() => Number)
-  // @IsInt()
-  // status: UserStatus;
-
-  // @IsOptional()
-  // token: string;
 }
+
 export class UpdateUserDto {
   @IsOptional()
   @IsInt({ each: true })
@@ -69,6 +47,20 @@ export class UpdateUserDto {
   token: string;
 }
 
+export class RegisterUserDto {
+  @IsNotEmpty()
+  name: string;
+
+  @IsNotEmpty()
+  username: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(32)
+  password: string;
+}
+
 export class GetUserDto {
   @IsOptional()
   page: string;
@@ -92,7 +84,3 @@ export class GetUserProjectsDto {
   @IsOptional()
   perPage: string;
 }
-
-// export class GetUserDto {
-//   uuid: string;
-// }

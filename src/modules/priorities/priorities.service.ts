@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
-import { assignIfHasKey } from '../../utilities';
+import { assignIfHasKey, matchWord } from '../../utilities';
 import { Priority } from '../entities/priorities.entity';
 import { User } from '../entities/users.entity';
 import { CreatePriorityDto, UpdatePriorityDto } from './dto/priorities.dto';
@@ -42,7 +42,7 @@ export class PrioritiesService {
         const uniqueArr = ['name', 'order'];
 
         uniqueArr.forEach((item) => {
-          if (detail.indexOf(item) !== -1)
+          if (matchWord(detail, item) !== null)
             ErrorHelper.ConflictException(`This ${item} already exists`);
         });
       } else ErrorHelper.InternalServerErrorException();

@@ -22,6 +22,7 @@ export class User extends BaseTable {
     Object.assign(this, partial);
   }
 
+  @Exclude({ toPlainOnly: true })
   @Column({
     nullable: true,
     unique: true,
@@ -50,8 +51,8 @@ export class User extends BaseTable {
 
   @Column({
     nullable: false,
-    type: Number,
-    default: UserStatus.Inactive,
+    type: 'bool',
+    default: !!UserStatus.Inactive,
   })
   status: UserStatus;
 
@@ -68,6 +69,13 @@ export class User extends BaseTable {
     default: null,
   })
   token?: string;
+
+  @Column({
+    nullable: false,
+    type: 'bool',
+    default: false,
+  })
+  isRegistered?: boolean;
 
   @Exclude({ toPlainOnly: true })
   @ManyToOne(() => Admin, (admin) => admin.users, { onDelete: 'CASCADE' })

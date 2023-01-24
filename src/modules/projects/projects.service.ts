@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import _ from 'lodash';
 import slugify from 'slugify';
 import { PAGE_NO_LIMIT } from '../../constants';
+import { Role } from '../../enums';
 import { IPaginationResponse } from '../../interfaces';
 import { APP_MESSAGE } from '../../messages';
 import { assignIfHasKey, datesToISOString, myMapPick } from '../../utilities';
@@ -47,14 +48,22 @@ export class ProjectsService {
     }
   }
 
-  async getProjects(filterTaskDto): Promise<IPaginationResponse<Project>> {
-    // const { page, perPage } = filterTaskDto;
-
-    const queryBuilderRepo = await this.projectsRepository
+  async getProjects(filterTaskDto, currentUser: User): Promise<IPaginationResponse<Project>> {
+    let queryBuilderRepo = this.projectsRepository
       .createQueryBuilder('p')
       .leftJoin('p.tasks', 't')
       .leftJoin('t.status', 's')
       .select(['p', 't', 's']);
+
+    if (currentUser.role === Role.USER) {
+      queryBuilderRepo = this.projectsRepository
+        .createQueryBuilder('p')
+        .leftJoin('p.users', 'u')
+        .leftJoin('p.tasks', 't')
+        .leftJoin('t.status', 's')
+        .where('u.id = :userId', { userId: currentUser.id })
+        .select(['p', 't', 's']);
+    }
 
     const data = await this.projectsRepository.paginationQueryBuilder(
       queryBuilderRepo,
@@ -64,7 +73,6 @@ export class ProjectsService {
 
     const pickPropProjects = myMapPick(data.items, ['id', 'name', 'tasks']);
     const getProcess = (tasks: Task[]) => {
-      console.log({ tasks: tasks?.[0]?.status });
       if (tasks.length === 0) return 0;
       const closedTasks = tasks.filter((task) => task?.status?.order === 0);
       return closedTasks.length / tasks.length;
@@ -113,7 +121,10 @@ export class ProjectsService {
     try {
       const { name, slug, startDate, endDate } = updateProjectDto;
       const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
-      const generatedSlug = slugify(slug || name, { replacement: '-', lower: true });
+      const generatedSlug = slugify(slug || name || project.slug, {
+        replacement: '-',
+        lower: true,
+      });
       assignIfHasKey(project, {
         ...updateProjectDto,
         startDate: formattedStartDate,
@@ -142,6 +153,8 @@ export class ProjectsService {
       users: [...(membersOfProject.items as User[]), ...memberShouldBeAdded],
     });
 
+    await this.projectsRepository.save([project]);
+
     return APP_MESSAGE.ADDED_SUCCESSFULLY('members');
   }
 
@@ -153,6 +166,8 @@ export class ProjectsService {
 
     const memberAfterRemoving = _.differenceBy(membersOfProject.items as User[], users, 'id');
     assignIfHasKey(project, { users: memberAfterRemoving });
+
+    await this.projectsRepository.save([project]);
 
     return APP_MESSAGE.REMOVED_SUCCESSFULLY('members');
   }

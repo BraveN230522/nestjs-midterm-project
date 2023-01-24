@@ -56,6 +56,7 @@ export class AuthService {
     // });
     // return;
     const found = await this.userService.getUserByUsername({ username });
+    console.log({ found });
     const match =
       (await bcrypt.compare(password || '', found?.password || '')) && username === found?.username;
 

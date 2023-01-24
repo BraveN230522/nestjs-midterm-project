@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
-import { assignIfHasKey } from '../../utilities';
+import { assignIfHasKey, matchWord } from '../../utilities';
 import { Type } from '../entities/types.entity';
 import { User } from '../entities/users.entity';
 import { CreateTypeDto, UpdateTypeDto } from './dto/types.dto';
@@ -42,7 +42,7 @@ export class TypesService {
         const uniqueArr = ['name', 'color'];
 
         uniqueArr.forEach((item) => {
-          if (detail.indexOf(item) !== -1)
+          if (matchWord(detail, item) !== null)
             ErrorHelper.ConflictException(`This ${item} already exists`);
         });
       } else ErrorHelper.InternalServerErrorException();

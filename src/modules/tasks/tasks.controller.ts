@@ -13,8 +13,8 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  getTasks(@Body() getTaskDto: GetTaskDto) {
-    return this.tasksService.getTasks(getTaskDto);
+  getTasks(@Body() getTaskDto: GetTaskDto, @UserDecorator() currentUser) {
+    return this.tasksService.getTasks(getTaskDto, currentUser);
   }
 
   @Get('/:id')

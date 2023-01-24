@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RoleDecorator } from '../../common/decorators';
+import { RoleDecorator, UserDecorator } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 import { Role } from '../../enums';
 import { IPaginationResponse } from '../../interfaces';
@@ -31,8 +31,11 @@ export class ProjectsController {
 
   @RoleDecorator(Role.ADMIN, Role.USER)
   @Get()
-  getProjects(@Body() getProjectsDto: GetProjectsDto): Promise<IPaginationResponse<Project>> {
-    return this.projectsService.getProjects(getProjectsDto);
+  getProjects(
+    @Body() getProjectsDto: GetProjectsDto,
+    @UserDecorator() currentUser,
+  ): Promise<IPaginationResponse<Project>> {
+    return this.projectsService.getProjects(getProjectsDto, currentUser);
   }
 
   @RoleDecorator(Role.ADMIN, Role.USER)

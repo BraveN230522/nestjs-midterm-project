@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ErrorHelper } from '../../helpers';
 import { IPaginationResponse } from '../../interfaces';
-import { assignIfHasKey } from '../../utilities';
+import { assignIfHasKey, matchWord } from '../../utilities';
 import { Status } from '../entities/statuses.entity';
 import { CreateStatusDto, UpdateStatusDto } from './dto/statuses.dto';
 import { StatusesRepository } from './statuses.repository';
@@ -43,7 +43,7 @@ export class StatusesService {
         const uniqueArr = ['name', 'order'];
 
         uniqueArr.forEach((item) => {
-          if (detail.indexOf(item) !== -1)
+          if (matchWord(detail, item) !== null)
             ErrorHelper.ConflictException(`This ${item} already exists`);
         });
       } else ErrorHelper.InternalServerErrorException();
