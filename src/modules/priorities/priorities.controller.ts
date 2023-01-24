@@ -13,17 +13,19 @@ export class PrioritiesController {
   constructor(private PrioritiesService: PrioritiesService) {}
 
   @Get()
+  @RoleDecorator(Role.ADMIN)
   getPriorities(): Promise<Priority[]> {
     return this.PrioritiesService.getPriorities();
   }
 
   @Post()
+  @RoleDecorator(Role.ADMIN)
   createPriority(@Body() createPriorityDto: CreatePriorityDto): Promise<Priority> {
     return this.PrioritiesService.createPriority(createPriorityDto);
   }
 
   @Patch('/:id')
-  // @RoleDecorator(Role.ADMIN)
+  @RoleDecorator(Role.ADMIN)
   updateProject(@Param('id') id, @Body() updatePriorityDto: UpdatePriorityDto): Promise<Priority> {
     return this.PrioritiesService.updatePriority(id, updatePriorityDto);
   }

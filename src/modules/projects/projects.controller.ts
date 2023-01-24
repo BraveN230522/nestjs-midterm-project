@@ -23,7 +23,7 @@ import { ProjectsService } from './projects.service';
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
-  @RoleDecorator(Role.ADMIN, Role.USER)
+  @RoleDecorator(Role.ADMIN)
   @Post()
   createProject(@Body() createProjectDto: CreateProjectDto): Promise<Project> {
     return this.projectsService.createProject(createProjectDto);
@@ -45,12 +45,12 @@ export class ProjectsController {
   }
 
   @Patch('/:id')
-  // @RoleDecorator(Role.ADMIN)
+  @RoleDecorator(Role.ADMIN)
   updateProject(@Param('id') id, @Body() updateProjectDto: UpdateProjectDto): Promise<Project> {
     return this.projectsService.updateProject(id, updateProjectDto);
   }
 
-  @RoleDecorator(Role.ADMIN, Role.USER)
+  @RoleDecorator(Role.ADMIN)
   @Delete('/:id')
   deleteProject(@Param('id') id): Promise<any> {
     return this.projectsService.deleteProject(id);
@@ -65,13 +65,13 @@ export class ProjectsController {
     return this.projectsService.getProjectMembers(id, getProjectMembersDto);
   }
 
-  @RoleDecorator(Role.ADMIN, Role.USER)
+  @RoleDecorator(Role.ADMIN)
   @Patch('/members/:id')
   addMembers(@Body() addMembersDto: AddMembersDto, @Param('id') id): Promise<string> {
     return this.projectsService.addMembers(addMembersDto, id);
   }
 
-  @RoleDecorator(Role.ADMIN, Role.USER)
+  @RoleDecorator(Role.ADMIN)
   @Delete('/members/:id')
   removeMembers(@Body() removeMembersDto: RemoveMembersDto, @Param('id') id): Promise<string> {
     return this.projectsService.removeMembers(removeMembersDto, id);

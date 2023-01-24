@@ -2,6 +2,8 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Param,
+  Patch,
   Post,
   UseInterceptors,
   ValidationPipe,
@@ -9,9 +11,7 @@ import {
 import { Admin } from '../entities/admin.entity';
 import { User } from '../entities/users.entity';
 import { AuthService } from './auth.service';
-import { AdminCredentialsDto } from './dto/auth.dto';
-
-// import { AdminGuard } from '@nestjs/passport';
+import { AdminCredentialsDto, RegisterUserDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,5 +28,10 @@ export class AuthController {
     @Body(new ValidationPipe({ transform: true })) adminCredentialsDto: AdminCredentialsDto,
   ): Promise<User> {
     return this.adminService.loginUser(adminCredentialsDto);
+  }
+
+  @Patch('/register/:uuid')
+  registerUser(@Param('uuid') uuid, @Body() registerUserDto: RegisterUserDto): Promise<string> {
+    return this.adminService.register(uuid, registerUserDto);
   }
 }

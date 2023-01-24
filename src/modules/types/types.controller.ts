@@ -13,32 +13,20 @@ export class TypesController {
   constructor(private TypesService: TypesService) {}
 
   @Get()
+  @RoleDecorator(Role.ADMIN)
   getTypes(): Promise<Type[]> {
     return this.TypesService.getTypes();
   }
 
   @Post()
-  @RoleDecorator(Role.USER)
+  @RoleDecorator(Role.ADMIN)
   createType(@Body() createTypeDto: CreateTypeDto): Promise<Type> {
     return this.TypesService.createType(createTypeDto);
   }
 
   @Patch('/:id')
-  // @RoleDecorator(Role.ADMIN)
-  updateProject(@Param('id') id, @Body() updateTypeDto: UpdateTypeDto): Promise<Type> {
+  @RoleDecorator(Role.ADMIN)
+  updateType(@Param('id') id, @Body() updateTypeDto: UpdateTypeDto): Promise<Type> {
     return this.TypesService.updateType(id, updateTypeDto);
   }
-
-  // @Delete('/:id')
-  // deleteType(@Param('id') id): Promise<void> {
-  //   return this.TypesService.deleteType(id);
-  // }
-
-  // @Patch('/:id')
-  // updateType(
-  //   @Param('id') id,
-  //   @Body() updateTypeDto: CreateTypeDto,
-  // ): Promise<Type> {
-  //   return this.TypesService.updateType(id, updateTypeDto);
-  // }
 }

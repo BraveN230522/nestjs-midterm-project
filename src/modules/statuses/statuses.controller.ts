@@ -12,32 +12,20 @@ export class StatusesController {
   constructor(private StatusesService: StatusesService) {}
 
   @Get()
+  @RoleDecorator(Role.ADMIN)
   getStatuses(): Promise<Status[]> {
     return this.StatusesService.getStatuses();
   }
 
   @Post()
-  @RoleDecorator(Role.USER)
+  @RoleDecorator(Role.ADMIN)
   createStatus(@Body() createStatusDto: CreateStatusDto): Promise<Status> {
     return this.StatusesService.createStatus(createStatusDto);
   }
 
   @Patch('/:id')
-  // @RoleDecorator(Role.ADMIN)
+  @RoleDecorator(Role.ADMIN)
   updateProject(@Param('id') id, @Body() updateStatusDto: UpdateStatusDto): Promise<Status> {
     return this.StatusesService.updateStatus(id, updateStatusDto);
   }
-
-  // @Delete('/:id')
-  // deleteStatus(@Param('id') id): Promise<void> {
-  //   return this.StatusesService.deleteStatus(id);
-  // }
-
-  // @Patch('/:id')
-  // updateStatus(
-  //   @Param('id') id,
-  //   @Body() updateStatusDto: CreateStatusDto,
-  // ): Promise<Status> {
-  //   return this.StatusesService.updateStatus(id, updateStatusDto);
-  // }
 }

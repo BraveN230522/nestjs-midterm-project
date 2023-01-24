@@ -23,17 +23,17 @@ export class TasksController {
   }
 
   @Post()
-  // @RoleDecorator(Role.USER)
   createTask(@Body() createTaskDto: CreateTaskDto, @UserDecorator() user: User): Promise<Task> {
     return this.tasksService.createTask(createTaskDto, user);
   }
 
   @Patch('/:id')
-  updateProject(@Param('id') id, @Body() updateTaskDto: UpdateTaskDto): Promise<Task> {
+  updateTask(@Param('id') id, @Body() updateTaskDto: UpdateTaskDto): Promise<Task> {
     return this.tasksService.updateTask(id, updateTaskDto);
   }
 
   @Delete('/:id')
+  @RoleDecorator(Role.ADMIN)
   deleteTask(@Param('id') id): Promise<void> {
     return this.tasksService.deleteTask(id);
   }

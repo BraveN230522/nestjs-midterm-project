@@ -47,20 +47,6 @@ export class UpdateUserDto {
   token: string;
 }
 
-export class RegisterUserDto {
-  @IsNotEmpty()
-  name: string;
-
-  @IsNotEmpty()
-  username: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(3)
-  @MaxLength(32)
-  password: string;
-}
-
 export class GetUserDto {
   @IsOptional()
   page: string;

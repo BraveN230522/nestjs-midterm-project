@@ -3,11 +3,15 @@ import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import _ from 'lodash';
 import { Role } from '../../enums';
-import { ErrorHelper } from '../../helpers';
+import { EncryptHelper, ErrorHelper } from '../../helpers';
+import { APP_MESSAGE } from '../../messages';
+import { assignIfHasKey, matchWord } from '../../utilities';
 import { AdminService } from '../admin/admin.service';
 import { Admin } from '../entities/admin.entity';
 import { User } from '../entities/users.entity';
 import { UsersService } from '../users/users.service';
+import { UsersRepository } from './../users/users.repository';
+import { RegisterUserDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +19,7 @@ export class AuthService {
     private jwtService: JwtService,
     private adminService: AdminService,
     private userService: UsersService,
+    private usersRepository: UsersRepository,
   ) {}
 
   async loginAdmin({ username, password }): Promise<Admin> {
@@ -86,6 +91,31 @@ export class AuthService {
 
       default:
         break;
+    }
+  }
+
+  async register(uuid, registerUserDto: RegisterUserDto): Promise<string> {
+    const user = await this.userService.getUser(uuid);
+
+    if (user.isRegistered) ErrorHelper.BadRequestException('User has been registered');
+
+    try {
+      const password = await EncryptHelper.hash(registerUserDto.password, 1);
+      assignIfHasKey(user, { ...registerUserDto, password, isRegistered: true });
+
+      await this.usersRepository.save([user]);
+
+      return APP_MESSAGE.UPDATED_SUCCESSFULLY('user');
+    } catch (error) {
+      if (error.code === '23505') {
+        const detail = error.detail as string;
+        const uniqueArr = ['name', 'username'];
+
+        uniqueArr.forEach((item) => {
+          if (matchWord(detail, item) !== null)
+            ErrorHelper.ConflictException(`This ${item} already exists`);
+        });
+      } else ErrorHelper.InternalServerErrorException();
     }
   }
 }

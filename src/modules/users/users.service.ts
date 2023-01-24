@@ -7,7 +7,6 @@ import { APP_MESSAGE } from '../../messages';
 import { assignIfHasKey, matchWord } from '../../utilities';
 import { User } from '../entities/users.entity';
 import { ProjectsRepository } from '../projects/projects.repository';
-import { RegisterUserDto } from './dto/users.dto';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
@@ -84,31 +83,6 @@ export class UsersService {
           if (matchWord(detail, item) !== null) {
             ErrorHelper.ConflictException(`This ${item} already exists`);
           }
-        });
-      } else ErrorHelper.InternalServerErrorException();
-    }
-  }
-
-  async register(uuid, registerUserDto: RegisterUserDto): Promise<string> {
-    const user = await this.getUser(uuid);
-
-    if (user.isRegistered) ErrorHelper.BadRequestException('User has been registered');
-
-    try {
-      const password = await EncryptHelper.hash(registerUserDto.password, 1);
-      assignIfHasKey(user, { ...registerUserDto, password, isRegistered: true });
-
-      await this.usersRepository.save([user]);
-
-      return APP_MESSAGE.UPDATED_SUCCESSFULLY('user');
-    } catch (error) {
-      if (error.code === '23505') {
-        const detail = error.detail as string;
-        const uniqueArr = ['name', 'username'];
-
-        uniqueArr.forEach((item) => {
-          if (matchWord(detail, item) !== null)
-            ErrorHelper.ConflictException(`This ${item} already exists`);
         });
       } else ErrorHelper.InternalServerErrorException();
     }
