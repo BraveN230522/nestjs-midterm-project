@@ -18,7 +18,6 @@ export class PrioritiesController {
   }
 
   @Post()
-  @RoleDecorator(Role.USER)
   createPriority(@Body() createPriorityDto: CreatePriorityDto): Promise<Priority> {
     return this.PrioritiesService.createPriority(createPriorityDto);
   }
@@ -28,17 +27,4 @@ export class PrioritiesController {
   updateProject(@Param('id') id, @Body() updatePriorityDto: UpdatePriorityDto): Promise<Priority> {
     return this.PrioritiesService.updatePriority(id, updatePriorityDto);
   }
-
-  // @Delete('/:id')
-  // deletePriority(@Param('id') id): Promise<void> {
-  //   return this.PrioritiesService.deletePriority(id);
-  // }
-
-  // @Patch('/:id')
-  // updatePriority(
-  //   @Param('id') id,
-  //   @Body() updatePriorityDto: CreatePriorityDto,
-  // ): Promise<Priority> {
-  //   return this.PrioritiesService.updatePriority(id, updatePriorityDto);
-  // }
 }

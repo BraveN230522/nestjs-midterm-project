@@ -2,6 +2,7 @@ import { Exclude, Expose } from 'class-transformer';
 import {
   Column,
   Entity,
+  Generated,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -20,6 +21,13 @@ export class User extends BaseTable {
     super();
     Object.assign(this, partial);
   }
+
+  @Column({
+    nullable: true,
+    unique: true,
+  })
+  @Generated('uuid')
+  inviteId?: string;
 
   @Column({
     nullable: true,

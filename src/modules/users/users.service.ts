@@ -55,8 +55,7 @@ export class UsersService {
 
       return mappingUser;
     } catch (error) {
-      if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
-      else ErrorHelper.InternalServerErrorException();
+      ErrorHelper.InternalServerErrorException();
     }
   }
 

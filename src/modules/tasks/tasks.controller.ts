@@ -23,7 +23,7 @@ export class TasksController {
   }
 
   @Post()
-  @RoleDecorator(Role.USER)
+  // @RoleDecorator(Role.USER)
   createTask(@Body() createTaskDto: CreateTaskDto, @UserDecorator() user: User): Promise<Task> {
     return this.tasksService.createTask(createTaskDto, user);
   }

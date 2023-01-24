@@ -27,11 +27,26 @@ export class TasksService {
   ) {}
 
   async getTasks(getTaskDto): Promise<IPaginationResponse<Task>> {
-    const { page, perPage } = getTaskDto;
-    return this.tasksRepository.paginationRepository(this.tasksRepository, {
-      page,
-      perPage,
-    });
+    const queryBuilderRepo = await this.tasksRepository
+      .createQueryBuilder('t')
+      .leftJoin('t.status', 's')
+      .leftJoin('t.priority', 'p')
+      .orderBy('s.order', 'DESC')
+      // .orderBy('p.order', 'ASC')
+      .select([
+        't.id',
+        't.name',
+        't.startDate',
+        't.endDate',
+        's.id',
+        's.name',
+        's.order',
+        'p.id',
+        'p.name',
+        'p.order',
+      ]);
+
+    return this.tasksRepository.paginationQueryBuilder(queryBuilderRepo, getTaskDto, true);
   }
 
   async getTask(id): Promise<Task> {
