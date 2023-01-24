@@ -7,11 +7,11 @@ export const assignIfHasKey = (assignedObj: ObjectAny, obj: ObjectAny) => {
   });
 };
 
-export const myMapOmit = <T>(data: T[] | any, toOmit: string[]) => {
+export const myMapOmit = <T>(data: T[] | Record<string, any>, toOmit: string[]) => {
   return _.compact(_.map(data, (item) => (item ? _.omit(item, toOmit) : null)));
 };
 
-export const myMapPick = <T>(data: T[], toPick: string[]) => {
+export const myMapPick = <T>(data: T[] | Record<string, any>, toPick: string[]) => {
   return _.compact(_.map(data, (item) => (item ? _.pick(item, toPick) : null)));
 };
 

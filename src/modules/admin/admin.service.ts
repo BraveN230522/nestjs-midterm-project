@@ -47,7 +47,6 @@ export class AdminService {
 
       return user;
     } catch (error) {
-      console.log({ error });
       if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
       else ErrorHelper.InternalServerErrorException();
     }

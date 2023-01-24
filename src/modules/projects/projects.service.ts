@@ -5,14 +5,14 @@ import slugify from 'slugify';
 import { PAGE_NO_LIMIT } from '../../constants';
 import { IPaginationResponse } from '../../interfaces';
 import { APP_MESSAGE } from '../../messages';
-import { assignIfHasKey, datesToISOString } from '../../utilities';
+import { assignIfHasKey, datesToISOString, myMapPick } from '../../utilities';
 import { Project } from '../entities/projects.entity';
 import { Task } from '../entities/tasks.entity';
 import { User } from '../entities/users.entity';
 import { TasksRepository } from '../tasks/tasks.repository';
 import { UsersRepository } from '../users/users.repository';
 import { ErrorHelper } from './../../helpers/error.helper';
-import { CreateProjectDto, GetProjectTasksDto } from './dto/projects.dto';
+import { CreateProjectDto, GetProjectTasksDto, UpdateProjectDto } from './dto/projects.dto';
 import { ProjectsRepository } from './projects.repository';
 
 @Injectable()
@@ -42,18 +42,47 @@ export class ProjectsService {
 
       return project;
     } catch (error) {
-      console.log({ error });
       if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
       else ErrorHelper.InternalServerErrorException();
     }
   }
 
   async getProjects(filterTaskDto): Promise<IPaginationResponse<Project>> {
-    const { page, perPage } = filterTaskDto;
-    return this.projectsRepository.paginationRepository(this.projectsRepository, {
-      page,
-      perPage,
+    // const { page, perPage } = filterTaskDto;
+
+    const queryBuilderRepo = await this.projectsRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.tasks', 't')
+      .leftJoin('t.status', 's')
+      .select(['p', 't', 's']);
+
+    const data = await this.projectsRepository.paginationQueryBuilder(
+      queryBuilderRepo,
+      filterTaskDto,
+      true,
+    );
+
+    const pickPropProjects = myMapPick(data.items, ['id', 'name', 'tasks']);
+    const getProcess = (tasks: Task[]) => {
+      console.log({ tasks: tasks?.[0]?.status });
+      if (tasks.length === 0) return 0;
+      const closedTasks = tasks.filter((task) => task?.status?.order === 0);
+      return closedTasks.length / tasks.length;
+    };
+
+    const mappingProjects = _.map(pickPropProjects, (project) => {
+      return {
+        id: project.id,
+        name: project.name,
+        taskTotal: project.tasks.length,
+        process: getProcess(project.tasks),
+      };
     });
+
+    return {
+      items: mappingProjects,
+      pagination: data.pagination,
+    };
   }
 
   async getProject(id): Promise<Project> {
@@ -79,13 +108,26 @@ export class ProjectsService {
     );
   }
 
-  async updateProject(id, updateProjectDto): Promise<Project> {
+  async updateProject(id, updateProjectDto: UpdateProjectDto): Promise<Project> {
     const project = await this.getProject(id);
-    assignIfHasKey(project, updateProjectDto);
+    try {
+      const { name, slug, startDate, endDate } = updateProjectDto;
+      const [formattedStartDate, formattedEndDate] = datesToISOString([startDate, endDate]);
+      const generatedSlug = slugify(slug || name, { replacement: '-', lower: true });
+      assignIfHasKey(project, {
+        ...updateProjectDto,
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+        slug: generatedSlug,
+      });
 
-    await this.projectsRepository.save([project]);
+      await this.projectsRepository.save([project]);
 
-    return project;
+      return project;
+    } catch (error) {
+      if (error.code === '23505') ErrorHelper.ConflictException('This name already exists');
+      else ErrorHelper.InternalServerErrorException();
+    }
   }
 
   async addMembers(addMembersDto, id): Promise<string> {
@@ -145,10 +187,11 @@ export class ProjectsService {
     id,
     getProjectTasksDto: GetProjectTasksDto,
   ): Promise<IPaginationResponse<Task>> {
-    console.log({ getProjectTasksDto });
     const queryBuilderRepo = await this.tasksRepository
       .createQueryBuilder('t')
       .leftJoin('t.project', 'p')
+      .leftJoin('t.status', 's')
+      .select(['t.id', 't.name', 't.startDate', 't.endDate', 's.id', 's.name', 's.order'])
       .where('p.id = :projectId', { projectId: id });
 
     return await this.tasksRepository.paginationQueryBuilder(

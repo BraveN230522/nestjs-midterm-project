@@ -10,10 +10,16 @@ export class Project extends BaseTable {
     Object.assign(this, partial);
   }
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   name: string;
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   slug: string;
 
   @Column({ type: 'timestamp with time zone' })
